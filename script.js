@@ -569,12 +569,121 @@ function playMusic() {
     }
 }
 
-// ==================== 8. TEXT ART GENERATOR (MADE OF "Thanh ") ====================
+// ==================== 8. TEXT PORTRAIT CANVAS (PHOTOSHOP STYLE) ====================
 function initTextArt() {
-    const displayEl = document.getElementById('text-art-display');
-    if (!displayEl) return;
+    const canvas = document.getElementById('text-portrait-canvas');
+    const hint   = document.querySelector('.portrait-hint');
+    if (!canvas) return;
 
-    if (window.THANH_TEXT_ART) {
-        displayEl.textContent = window.THANH_TEXT_ART;
-    }
+    const CANVAS_W = 600;
+    const CANVAS_H = 800;
+    canvas.width  = CANVAS_W;
+    canvas.height = CANVAS_H;
+
+    const ctx = canvas.getContext('2d');
+
+    // Dark background
+    ctx.fillStyle = '#0d0d1a';
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+    // Load portrait image
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = 'assets/thanh.png';
+
+    img.onload = () => {
+        // ---- Step 1: sample the image into a small grid ----
+        const SAMPLE_W = 120;
+        const SAMPLE_H = Math.round(SAMPLE_W * (img.height / img.width));
+
+        const offscreen = document.createElement('canvas');
+        offscreen.width  = SAMPLE_W;
+        offscreen.height = SAMPLE_H;
+        const octx = offscreen.getContext('2d');
+
+        // Crop: focus on the subject (skip top 32% which is mostly background)
+        const cropStartY = Math.floor(img.height * 0.32);
+        const cropH = img.height - cropStartY;
+        octx.drawImage(img, 0, cropStartY, img.width, cropH,
+                            0, 0, SAMPLE_W, SAMPLE_H);
+
+        const pixels = octx.getImageData(0, 0, SAMPLE_W, SAMPLE_H).data;
+
+        function lum(x, y) {
+            const i = (y * SAMPLE_W + x) * 4;
+            return (0.299 * pixels[i] + 0.587 * pixels[i+1] + 0.114 * pixels[i+2]) / 255;
+        }
+
+        // ---- Step 2: draw "Thanh" words scattered over dark-pixel areas ----
+        const WORD = 'Thanh';
+        const scaleX = CANVAS_W / SAMPLE_W;
+        const scaleY = CANVAS_H / SAMPLE_H;
+
+        // Shuffle sampling order for organic look
+        const positions = [];
+        for (let sy = 0; sy < SAMPLE_H; sy++) {
+            for (let sx = 0; sx < SAMPLE_W; sx++) {
+                const b = lum(sx, sy);
+                if (b < 0.55) {                     // only dark/mid-tone pixels
+                    positions.push({ sx, sy, b });
+                }
+            }
+        }
+        // Shuffle
+        for (let i = positions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [positions[i], positions[j]] = [positions[j], positions[i]];
+        }
+
+        // Draw words – density driven by brightness (darker = more words)
+        const drawn = new Set();
+        const STEP = 2; // sample step (lower = denser)
+
+        positions.forEach(({ sx, sy, b }) => {
+            // Skip some cells to avoid total overcrowding
+            const key = `${Math.floor(sx/STEP)}_${Math.floor(sy/STEP)}`;
+            if (drawn.has(key)) return;
+            drawn.add(key);
+
+            // Font size: small for lighter pixels, bigger for very dark (hair/dress)
+            const darkness = 1 - b;               // 0..1, higher = darker
+            const skip = darkness < 0.30;          // skip very light areas
+            if (skip) return;
+
+            const fontSize = Math.round(7 + darkness * 8); // 7–15 px
+            const angle = (Math.random() - 0.5) * 0.6;     // ±0.3 rad rotation
+
+            // Pink-to-white based on darkness
+            const alpha = 0.35 + darkness * 0.65;
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.font = `${fontSize}px 'Quicksand', sans-serif`;
+            ctx.fillStyle = '#ff85a2';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            const cx = (sx + 0.5) * scaleX;
+            const cy = (sy + 0.5) * scaleY;
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+            ctx.fillText(WORD, 0, 0);
+            ctx.restore();
+        });
+
+        // Subtle pink vignette glow around edges
+        const vignette = ctx.createRadialGradient(
+            CANVAS_W/2, CANVAS_H/2, CANVAS_H * 0.25,
+            CANVAS_W/2, CANVAS_H/2, CANVAS_H * 0.75
+        );
+        vignette.addColorStop(0, 'rgba(0,0,0,0)');
+        vignette.addColorStop(1, 'rgba(13,13,26,0.65)');
+        ctx.fillStyle = vignette;
+        ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+        if (hint) hint.textContent = '✨ Được vẽ bằng hàng nghìn chữ "Thanh" 🌸';
+    };
+
+    img.onerror = () => {
+        if (hint) hint.textContent = 'Không tải được ảnh.';
+    };
 }

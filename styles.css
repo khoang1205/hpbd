@@ -948,6 +948,35 @@ section {
     width: 100%;
 }
 
+/* Text Portrait Canvas (Photoshop-style text portrait) */
+.text-portrait-wrapper {
+    width: 100%;
+    max-width: 600px;
+    margin: 16px auto 0;
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #0d0d1a;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.35), 0 0 40px rgba(255,133,162,0.12);
+    border: 1.5px solid rgba(255,133,162,0.3);
+}
+
+#text-portrait-canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.portrait-hint {
+    text-align: center;
+    font-size: 0.85rem;
+    color: rgba(255,133,162,0.7);
+    padding: 8px 0 12px;
+    margin: 0;
+    font-weight: 600;
+}
+
+
 .text-art-box {
     background: #1e1e2e;
     border-radius: 18px;
