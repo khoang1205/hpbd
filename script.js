@@ -554,19 +554,25 @@ function initPhotoModal() {
     const zoomOutBtn = document.getElementById('modal-zoom-out');
     const zoomResetBtn = document.getElementById('modal-zoom-reset');
 
+    const zoomLevelText = document.getElementById('modal-zoom-level');
+
     if (!modal || !modalImg) return;
 
     let scale = 1.0;
     let translateX = 0;
     let translateY = 0;
     const MIN_SCALE = 1.0;
-    const MAX_SCALE = 6.0;
+    const MAX_SCALE = 20.0;
 
     function updateTransform(smooth = true) {
         if (!modalImg) return;
         modalImg.style.transition = smooth ? 'transform 0.15s ease-out' : 'none';
         modalImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
         
+        if (zoomLevelText) {
+            zoomLevelText.textContent = `${scale.toFixed(1)}x`;
+        }
+
         if (modalViewport) {
             if (scale > 1.05) {
                 modalViewport.style.cursor = 'grab';
@@ -637,14 +643,14 @@ function initPhotoModal() {
     if (zoomInBtn) {
         zoomInBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            scale = Math.min(MAX_SCALE, scale + 0.6);
+            scale = Math.min(MAX_SCALE, scale + 2.5);
             updateTransform(true);
         });
     }
     if (zoomOutBtn) {
         zoomOutBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            scale = Math.max(MIN_SCALE, scale - 0.6);
+            scale = Math.max(MIN_SCALE, scale - 2.5);
             if (scale <= 1.05) resetZoom();
             else updateTransform(true);
         });
@@ -664,16 +670,20 @@ function initPhotoModal() {
         let initialPinchDist = 0;
         let initialScale = 1.0;
 
-        // Double tap on mobile / click on desktop to toggle zoom
+        // 3-Stage Double tap on mobile / click on desktop to toggle deep zoom
         modalViewport.addEventListener('click', (e) => {
             const now = Date.now();
-            if (now - lastTap < 320) {
-                if (scale > 1.2) {
-                    resetZoom();
+            if (now - lastTap < 350) {
+                if (scale < 3.5) {
+                    scale = 5.5;
+                } else if (scale < 9.0) {
+                    scale = 12.0; // Deep zoom to see every "Thanh" letter clearly on mobile
                 } else {
-                    scale = 2.8;
-                    updateTransform(true);
+                    resetZoom();
+                    lastTap = 0;
+                    return;
                 }
+                updateTransform(true);
             }
             lastTap = now;
         });
@@ -746,7 +756,7 @@ function initPhotoModal() {
 
         modalViewport.addEventListener('wheel', (e) => {
             e.preventDefault();
-            const delta = e.deltaY > 0 ? -0.3 : 0.3;
+            const delta = e.deltaY > 0 ? -1.0 : 1.0;
             scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale + delta));
             if (scale <= 1.05) resetZoom();
             else updateTransform(true);
