@@ -206,21 +206,14 @@
         </footer>
     </section>
 
-    <!-- Modal image/text art preview with interactive Pinch/Zoom -->
+    <!-- Modal image/text art preview -->
     <div id="photo-modal" class="modal hidden-modal">
         <div class="modal-backdrop-overlay" id="modal-backdrop"></div>
         <div class="modal-content glass-card">
             <button id="close-modal" class="close-btn" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
-            <div class="modal-zoom-toolbar">
-                <button id="modal-zoom-in" class="zoom-tool-btn" type="button" title="Phóng to"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-                <button id="modal-zoom-out" class="zoom-tool-btn" type="button" title="Thu nhỏ"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
-                <button id="modal-zoom-reset" class="zoom-tool-btn" type="button" title="Đặt lại"><i class="fa-solid fa-arrows-rotate"></i></button>
-                <span id="modal-zoom-level" class="zoom-level-indicator">1.0x</span>
+            <div class="modal-img-container">
+                <img id="modal-img" src="" alt="Photo Preview">
             </div>
-            <div id="modal-image-viewport" class="modal-image-viewport">
-                <img id="modal-img" src="" alt="Photo Preview" draggable="false">
-            </div>
-            <p class="modal-zoom-instruction"><i class="fa-solid fa-hand-pointer"></i> Dùng 2 ngón tay thu phóng hoặc chạm đúp để xem chi tiết từng chữ</p>
             <p id="modal-caption" class="modal-caption"></p>
         </div>
     </div>

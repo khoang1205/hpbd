@@ -199,7 +199,8 @@ function initCandleBlowing() {
 }
 
 let micStartTime = 0;
-let consecutiveBlowCount = 0;
+let ambientBaseline = 0;
+let blowEnergy = 0;
 
 async function startMicDetection() {
     const btnStartMic = document.getElementById('btn-start-mic');
@@ -211,12 +212,14 @@ async function startMicDetection() {
         const microphone = audioContext.createMediaStreamSource(micStream);
         microphone.connect(analyser);
         analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.3;
 
         micStartTime = Date.now();
-        consecutiveBlowCount = 0;
+        ambientBaseline = 0;
+        blowEnergy = 0;
 
         if (btnStartMic) {
-            btnStartMic.innerHTML = `<i class="fa-solid fa-check"></i> Mic Đã Bật! Hãy Thổi`;
+            btnStartMic.innerHTML = `<i class="fa-solid fa-microphone-lines"></i> Mic Đã Bật! Hãy Thổi Vào Mic`;
             btnStartMic.style.background = 'linear-gradient(135deg, #b8f2e6 0%, #a2d2ff 100%)';
             btnStartMic.style.color = '#1b4965';
         }
@@ -229,38 +232,63 @@ async function startMicDetection() {
 }
 
 function listenMicVolume() {
-    if (isCandleBlown) return;
+    if (isCandleBlown || !analyser) return;
 
     const dataArray = new Uint8Array(analyser.frequencyBinCount);
     analyser.getByteFrequencyData(dataArray);
 
+    // 1. Calculate overall volume average
     let sum = 0;
     for (let i = 0; i < dataArray.length; i++) {
         sum += dataArray[i];
     }
     const average = sum / dataArray.length;
 
-    // Grace period: Ignore audio check for first 500ms after turning on mic to prevent click/warmup noise
-    const isWarmedUp = (Date.now() - micStartTime) > 500;
+    // 2. Calculate low-frequency blow turbulence energy (bins 0 to 8: < 350Hz)
+    let lowFreqSum = 0;
+    const lowBinsCount = Math.min(8, dataArray.length);
+    for (let i = 0; i < lowBinsCount; i++) {
+        lowFreqSum += dataArray[i];
+    }
+    const lowFreqAvg = lowFreqSum / lowBinsCount;
 
-    // Update Mic Level UI Bar
-    const levelFill = document.getElementById('mic-level');
-    if (levelFill) {
-        const percentage = Math.min(100, Math.max(0, (average / 80) * 100));
-        levelFill.style.width = `${percentage}%`;
+    const elapsed = Date.now() - micStartTime;
+
+    // 3. Calibration phase (first 1000ms): measure ambient room baseline
+    if (elapsed < 1000) {
+        if (ambientBaseline === 0) ambientBaseline = average;
+        else ambientBaseline = (ambientBaseline * 0.85) + (average * 0.15);
+        requestAnimationFrame(listenMicVolume);
+        return;
     }
 
-    // Check if blow volume steadily exceeds threshold
-    const threshold = CONFIG.micThreshold || 40;
-    if (isWarmedUp && average > threshold) {
-        consecutiveBlowCount++;
-        // Require steady blow for at least 4 consecutive frames
-        if (consecutiveBlowCount >= 4) {
+    // 4. Check if user is actually blowing into the mic
+    // Genuine blowing generates heavy low-frequency wind turbulence (lowFreqAvg > 95)
+    const blowThreshold = Math.max(65, ambientBaseline + 25);
+    const isBlowing = (lowFreqAvg > 90 && average > blowThreshold) || (average > 115) || (lowFreqAvg > 140);
+
+    const levelFill = document.getElementById('mic-level');
+
+    if (isBlowing) {
+        // Accumulate blow energy (requires steady blow ~300ms)
+        blowEnergy += 12;
+        if (levelFill) {
+            levelFill.style.width = `${Math.min(100, blowEnergy)}%`;
+            levelFill.style.background = 'linear-gradient(90deg, #ff85a2, #ff477e)';
+        }
+
+        if (blowEnergy >= 100) {
             triggerBlowSuccess();
             return;
         }
     } else {
-        consecutiveBlowCount = 0;
+        // Decay energy quickly when not blowing
+        blowEnergy = Math.max(0, blowEnergy - 5);
+        if (levelFill) {
+            const displayLevel = Math.max(0, Math.min(100, ((average - ambientBaseline) / 40) * 100));
+            levelFill.style.width = `${Math.max(blowEnergy, displayLevel * 0.25)}%`;
+            levelFill.style.background = 'linear-gradient(90deg, #b8f2e6, #ff85a2)';
+        }
     }
 
     requestAnimationFrame(listenMicVolume);
@@ -269,6 +297,18 @@ function listenMicVolume() {
 function triggerBlowSuccess() {
     if (isCandleBlown) return;
     isCandleBlown = true;
+
+    // Stop mic stream and audio processing
+    if (micStream) {
+        try {
+            micStream.getTracks().forEach(track => track.stop());
+        } catch (e) {}
+    }
+    if (audioContext && audioContext.state !== 'closed') {
+        try {
+            audioContext.close();
+        } catch (e) {}
+    }
 
     const flames = document.querySelectorAll('.flame-2d');
     const smokes = document.querySelectorAll('.smoke-2d');
@@ -539,7 +579,7 @@ function initTextArt() {
     });
 }
 
-// ==================== 9. PHOTO MODAL WITH PINCH-ZOOM & PAN ====================
+// ==================== 9. PHOTO MODAL PREVIEW ====================
 let openPhotoModal = null;
 let closePhotoModal = null;
 
@@ -549,52 +589,12 @@ function initPhotoModal() {
     const closeModalBtn = document.getElementById('close-modal');
     const modalImg = document.getElementById('modal-img');
     const modalCaption = document.getElementById('modal-caption');
-    const modalViewport = document.getElementById('modal-image-viewport');
-    const zoomInBtn = document.getElementById('modal-zoom-in');
-    const zoomOutBtn = document.getElementById('modal-zoom-out');
-    const zoomResetBtn = document.getElementById('modal-zoom-reset');
-
-    const zoomLevelText = document.getElementById('modal-zoom-level');
 
     if (!modal || !modalImg) return;
-
-    let scale = 1.0;
-    let translateX = 0;
-    let translateY = 0;
-    const MIN_SCALE = 1.0;
-    const MAX_SCALE = 20.0;
-
-    function updateTransform(smooth = true) {
-        if (!modalImg) return;
-        modalImg.style.transition = smooth ? 'transform 0.15s ease-out' : 'none';
-        modalImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-        
-        if (zoomLevelText) {
-            zoomLevelText.textContent = `${scale.toFixed(1)}x`;
-        }
-
-        if (modalViewport) {
-            if (scale > 1.05) {
-                modalViewport.style.cursor = 'grab';
-            } else {
-                modalViewport.style.cursor = 'default';
-                translateX = 0;
-                translateY = 0;
-            }
-        }
-    }
-
-    function resetZoom() {
-        scale = 1.0;
-        translateX = 0;
-        translateY = 0;
-        updateTransform(true);
-    }
 
     openPhotoModal = function(src, caption = '') {
         modalImg.src = src;
         if (modalCaption) modalCaption.textContent = caption;
-        resetZoom();
         modal.classList.remove('hidden-modal');
         document.body.style.overflow = 'hidden';
     };
@@ -602,7 +602,6 @@ function initPhotoModal() {
     closePhotoModal = function() {
         modal.classList.add('hidden-modal');
         document.body.style.overflow = '';
-        resetZoom();
     };
 
     // Close button events (Click & Touch)
@@ -638,129 +637,6 @@ function initPhotoModal() {
             closePhotoModal();
         }
     });
-
-    // Zoom Toolbar buttons
-    if (zoomInBtn) {
-        zoomInBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            scale = Math.min(MAX_SCALE, scale + 2.5);
-            updateTransform(true);
-        });
-    }
-    if (zoomOutBtn) {
-        zoomOutBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            scale = Math.max(MIN_SCALE, scale - 2.5);
-            if (scale <= 1.05) resetZoom();
-            else updateTransform(true);
-        });
-    }
-    if (zoomResetBtn) {
-        zoomResetBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            resetZoom();
-        });
-    }
-
-    // Touch & Mouse Interactive Zoom / Pan
-    if (modalViewport) {
-        let isDragging = false;
-        let startX = 0, startY = 0;
-        let lastTap = 0;
-        let initialPinchDist = 0;
-        let initialScale = 1.0;
-
-        // 3-Stage Double tap on mobile / click on desktop to toggle deep zoom
-        modalViewport.addEventListener('click', (e) => {
-            const now = Date.now();
-            if (now - lastTap < 350) {
-                if (scale < 3.5) {
-                    scale = 5.5;
-                } else if (scale < 9.0) {
-                    scale = 12.0; // Deep zoom to see every "Thanh" letter clearly on mobile
-                } else {
-                    resetZoom();
-                    lastTap = 0;
-                    return;
-                }
-                updateTransform(true);
-            }
-            lastTap = now;
-        });
-
-        // Touch event handlers (Pinch to zoom + 1 finger drag)
-        modalViewport.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 2) {
-                // Pinch start
-                const t1 = e.touches[0];
-                const t2 = e.touches[1];
-                initialPinchDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
-                initialScale = scale;
-            } else if (e.touches.length === 1 && scale > 1.05) {
-                // Pan start
-                isDragging = true;
-                startX = e.touches[0].clientX - translateX;
-                startY = e.touches[0].clientY - translateY;
-            }
-        }, { passive: false });
-
-        modalViewport.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 2 && initialPinchDist > 0) {
-                e.preventDefault();
-                const t1 = e.touches[0];
-                const t2 = e.touches[1];
-                const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
-                const newScale = initialScale * (dist / initialPinchDist);
-                scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, newScale));
-                updateTransform(false);
-            } else if (e.touches.length === 1 && isDragging && scale > 1.05) {
-                e.preventDefault();
-                translateX = e.touches[0].clientX - startX;
-                translateY = e.touches[0].clientY - startY;
-                updateTransform(false);
-            }
-        }, { passive: false });
-
-        modalViewport.addEventListener('touchend', (e) => {
-            if (e.touches.length < 2) initialPinchDist = 0;
-            if (e.touches.length === 0) {
-                isDragging = false;
-                if (scale < 1.05) resetZoom();
-            }
-        });
-
-        // Desktop Mouse Drag & Wheel Zoom
-        modalViewport.addEventListener('mousedown', (e) => {
-            if (scale > 1.05) {
-                isDragging = true;
-                startX = e.clientX - translateX;
-                startY = e.clientY - translateY;
-                modalViewport.classList.add('is-dragging');
-            }
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (isDragging && scale > 1.05) {
-                translateX = e.clientX - startX;
-                translateY = e.clientY - startY;
-                updateTransform(false);
-            }
-        });
-
-        window.addEventListener('mouseup', () => {
-            if (isDragging) {
-                isDragging = false;
-                modalViewport.classList.remove('is-dragging');
-            }
-        });
-
-        modalViewport.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            const delta = e.deltaY > 0 ? -1.0 : 1.0;
-            scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale + delta));
-            if (scale <= 1.05) resetZoom();
-            else updateTransform(true);
-        }, { passive: false });
-    }
 }
+
 

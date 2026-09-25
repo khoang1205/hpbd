@@ -1255,89 +1255,23 @@ section {
     color: #fff;
 }
 
-.modal-zoom-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-    z-index: 5;
-}
-
-.zoom-tool-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #fff;
-    border: 1.5px solid rgba(255, 133, 162, 0.5);
-    color: #ff85a2;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
-}
-
-.zoom-tool-btn:hover, .zoom-tool-btn:active {
-    transform: scale(1.08);
-    background: #ff85a2;
-    color: #fff;
-}
-
-.zoom-level-indicator {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--primary-pink);
-    background: rgba(255, 255, 255, 0.9);
-    padding: 4px 12px;
-    border-radius: 20px;
-    border: 1.5px solid rgba(255, 133, 162, 0.4);
-    min-width: 54px;
-    text-align: center;
-}
-
-.modal-image-viewport {
+.modal-img-container {
     width: 100%;
-    max-height: 60vh;
-    height: 480px;
-    overflow: hidden;
-    position: relative;
-    border-radius: 16px;
-    background: #0d0d1a;
+    max-height: 75vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
-    cursor: grab;
-    border: 1px solid rgba(255, 133, 162, 0.3);
-}
-
-.modal-image-viewport.is-dragging {
-    cursor: grabbing;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.03);
 }
 
 #modal-img {
     max-width: 100%;
-    max-height: 100%;
+    max-height: 72vh;
+    border-radius: 14px;
     object-fit: contain;
-    transform-origin: center center;
-    will-change: transform;
-    pointer-events: none;
-    user-select: none;
-    -webkit-user-drag: none;
-}
-
-.modal-zoom-instruction {
-    font-size: 0.8rem;
-    color: #666;
-    margin: 8px 0 2px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 .modal-caption {
@@ -1505,18 +1439,12 @@ section {
         border-radius: 18px;
     }
 
-    .modal-image-viewport {
-        height: 66vh;
-        max-height: 68vh;
-        border-radius: 14px;
+    .modal-img-container {
+        max-height: 70vh;
     }
 
     .modal-caption {
         font-size: 1.15rem;
-    }
-
-    .modal-zoom-instruction {
-        font-size: 0.72rem;
     }
 }
 

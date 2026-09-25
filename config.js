@@ -32,5 +32,5 @@ Một lần nữa, chúc ng đẹp luôn luôn vui cười, thích cái gì sẽ
     musicUrl: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=happy-birthday-155461.mp3",
     
     // Cấu hình mic thổi nến
-    micThreshold: 35 // Âm lượng ngưỡng phát hiện tiếng thổi vào mic (0-100)
+    micThreshold: 65 // Âm lượng ngưỡng phát hiện tiếng thổi vào mic (0-100)
 };
