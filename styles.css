@@ -954,3 +954,154 @@ section {
     color: var(--text-muted);
     text-align: center;
 }
+
+/* ==================== RESPONSIVE MOBILE STYLES ==================== */
+@media (max-width: 600px) {
+    section {
+        padding: 12px 10px;
+    }
+
+    .glass-card {
+        padding: 24px 18px;
+        border-radius: 20px;
+    }
+
+    /* Quiz Card Mobile */
+    .quiz-card {
+        max-width: 100%;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+    }
+
+    .quiz-question-text {
+        font-size: 1rem;
+        margin-bottom: 18px;
+    }
+
+    .input-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .input-group input {
+        width: 100%;
+        min-width: 100%;
+        padding: 12px 16px;
+    }
+
+    .input-group .btn-pastel {
+        width: 100%;
+    }
+
+    /* Cake Section Mobile */
+    .cake-card {
+        padding: 22px 14px;
+    }
+
+    .celebration-heading {
+        font-size: 1.9rem;
+        margin-bottom: 15px;
+    }
+
+    .cake-container {
+        transform: scale(0.85);
+        transform-origin: bottom center;
+        height: 230px;
+        margin-bottom: 10px;
+    }
+
+    .mic-control-box {
+        padding: 14px 12px;
+        border-radius: 14px;
+    }
+
+    .instruction-text {
+        font-size: 0.85rem;
+    }
+
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .btn-group .btn-pastel {
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 0.9rem;
+    }
+
+    /* Top Nav Mobile */
+    .top-nav {
+        padding: 10px 12px;
+        margin-top: 5px;
+    }
+
+    .logo-pastel {
+        font-size: 1.2rem;
+    }
+
+    .btn-music {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+
+    /* Playground Mobile */
+    .playground-container {
+        padding: 0 10px;
+        gap: 30px;
+    }
+
+    .hero-welcome h2 {
+        font-size: 1.9rem;
+    }
+
+    .hero-welcome p {
+        font-size: 0.9rem;
+    }
+
+    .section-subtitle {
+        font-size: 1.25rem;
+    }
+
+    /* Scratch Card Mobile */
+    .scratch-card-wrapper {
+        min-height: 320px;
+        border-radius: 16px;
+    }
+
+    .secret-letter-content {
+        padding: 20px 16px;
+        min-height: 320px;
+    }
+
+    .letter-header {
+        font-size: 1.5rem;
+    }
+
+    .letter-body {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .letter-footer {
+        font-size: 0.9rem;
+    }
+
+    /* Polaroid Empty Card Mobile */
+    .polaroid-card.empty-polaroid-card {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .celebration-heading {
+        font-size: 1.6rem;
+    }
+    .cake-container {
+        transform: scale(0.75);
+        height: 200px;
+    }
+}

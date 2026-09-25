@@ -407,20 +407,26 @@ function initScratchCard() {
     let scratchedPercentage = 0;
 
     // Set high-resolution canvas size based on parent container
-    canvas.width = canvas.offsetWidth || 600;
-    canvas.height = canvas.offsetHeight || 350;
+    const setupCanvasSize = () => {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width || 600;
+        canvas.height = rect.height || 350;
+        drawScratchCover(ctx, canvas.width, canvas.height);
+    };
 
-    // Draw Pastel Metallic Scratch Overlay
-    drawScratchCover(ctx, canvas.width, canvas.height);
+    setupCanvasSize();
+    window.addEventListener('resize', setupCanvasSize);
 
     // Event Listeners for scratch
     const getPos = (e) => {
         const r = canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const scaleX = canvas.width / r.width;
+        const scaleY = canvas.height / r.height;
         return {
-            x: clientX - r.left,
-            y: clientY - r.top
+            x: (clientX - r.left) * scaleX,
+            y: (clientY - r.top) * scaleY
         };
     };
 
@@ -431,7 +437,7 @@ function initScratchCard() {
 
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, 24, 0, Math.PI * 2);
+        ctx.arc(pos.x, pos.y, 28, 0, Math.PI * 2);
         ctx.fill();
 
         checkScratchedPercent();
