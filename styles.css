@@ -312,12 +312,12 @@ section {
     transition: opacity 0.1s linear;
 }
 
-/* ==================== SECTION 2: 2-TIER CAKE & CANDLE BLOWING ==================== */
+/* ==================== SECTION 2: LUXURY 3-TIER PASTEL CAKE ==================== */
 .cake-card {
     max-width: 650px;
     width: 100%;
     text-align: center;
-    padding: 40px 30px;
+    padding: 35px 25px;
 }
 
 .pastel-badge {
@@ -328,40 +328,40 @@ section {
     border-radius: 50px;
     font-weight: 700;
     font-size: 0.85rem;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     letter-spacing: 0.5px;
 }
 
 .celebration-heading {
     font-family: var(--font-heading);
-    font-size: 3rem;
+    font-size: 2.8rem;
     color: #4a4e69;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .celebration-heading span {
     color: var(--primary-pink);
 }
 
-/* 2-TIER PASTEL CAKE */
+/* LUXURY 3-TIER PASTEL CAKE CONSTRUCTION */
 .cake-container {
-    height: 280px;
+    height: 310px;
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     position: relative;
 }
 
 /* Warm Ambient Glow behind Candles */
 .cake-glow-aura {
     position: absolute;
-    top: 30px;
+    top: 15px;
     left: 50%;
     transform: translateX(-50%);
-    width: 260px;
-    height: 200px;
-    background: radial-gradient(circle, rgba(255, 220, 100, 0.45) 0%, rgba(255, 133, 162, 0.2) 50%, transparent 75%);
+    width: 280px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(255, 220, 100, 0.5) 0%, rgba(255, 133, 162, 0.25) 55%, transparent 78%);
     border-radius: 50%;
     pointer-events: none;
     z-index: 1;
@@ -374,96 +374,169 @@ section {
 }
 
 @keyframes auraPulse {
-    0% { transform: translateX(-50%) scale(0.95); opacity: 0.7; }
-    100% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+    0% { transform: translateX(-50%) scale(0.95); opacity: 0.75; }
+    100% { transform: translateX(-50%) scale(1.12); opacity: 1; }
 }
 
-.cake-2tier {
+.luxury-cake {
     position: relative;
-    width: 240px;
-    height: 170px;
+    width: 260px;
+    height: 220px;
     z-index: 2;
 }
 
-.plate-2tier {
-    width: 270px;
-    height: 20px;
-    background: linear-gradient(135deg, #ffffff 0%, #e9ecef 100%);
+/* Glassmorphic Pedestal Plate */
+.cake-plate {
+    width: 290px;
+    height: 24px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 240, 248, 0.8) 100%);
+    border: 2px solid rgba(255, 255, 255, 0.95);
     border-radius: 50%;
     position: absolute;
-    bottom: -8px;
+    bottom: -10px;
     left: -15px;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 14px 30px rgba(255, 133, 162, 0.25);
 }
 
-/* Bottom Tier */
-.tier-bottom {
-    height: 90px;
-    width: 240px;
+/* TIER 1 (Bottom - Strawberry Pink) */
+.cake-tier.tier-1 {
+    height: 75px;
+    width: 250px;
     background: linear-gradient(180deg, #ffb3c6 0%, #ff85a2 100%);
-    border-radius: 16px 16px 4px 4px;
+    border-radius: 18px 18px 6px 6px;
     position: absolute;
     bottom: 0;
-    left: 0;
-    border-bottom: 8px solid #f76c8f;
-    box-shadow: inset 0 8px 12px rgba(255, 255, 255, 0.3);
+    left: 5px;
+    border-bottom: 7px solid #f76c8f;
+    box-shadow: inset 0 8px 14px rgba(255, 255, 255, 0.35);
 }
 
-/* Top Tier */
-.tier-top {
-    height: 75px;
-    width: 170px;
+/* TIER 2 (Middle - Lavender Dream) */
+.cake-tier.tier-2 {
+    height: 65px;
+    width: 185px;
     background: linear-gradient(180deg, #e8dff5 0%, #c8b6ff 100%);
-    border-radius: 14px 14px 4px 4px;
+    border-radius: 16px 16px 6px 6px;
     position: absolute;
-    bottom: 88px;
-    left: 35px;
-    border-bottom: 7px solid #b8a3ff;
-    box-shadow: inset 0 6px 10px rgba(255, 255, 255, 0.4);
+    bottom: 73px;
+    left: 37.5px;
+    border-bottom: 6px solid #b8a3ff;
+    box-shadow: inset 0 6px 12px rgba(255, 255, 255, 0.4);
 }
 
-/* Cream Piping Decor */
-.top-decorations {
+/* TIER 3 (Top - Soft Vanilla Cream) */
+.cake-tier.tier-3 {
+    height: 55px;
+    width: 125px;
+    background: linear-gradient(180deg, #ffffff 0%, #fff0f5 100%);
+    border-radius: 14px 14px 6px 6px;
     position: absolute;
-    top: -8px;
+    bottom: 136px;
+    left: 67.5px;
+    border-bottom: 5px solid #f4e1d2;
+    box-shadow: inset 0 4px 8px rgba(255, 255, 255, 0.5);
+}
+
+/* Icing Drops & Pearls */
+.icing-wave {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 14px;
+    background: #ffffff;
+    border-radius: 10px 10px 14px 14px;
+    opacity: 0.9;
+}
+
+.pearl-sprinkles {
+    position: absolute;
+    width: 100%;
+    bottom: 12px;
+    display: flex;
+    justify-content: space-around;
+    padding: 0 10px;
+}
+
+.pearl {
+    width: 8px;
+    height: 8px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Whipped Creams & Strawberries on Top */
+.whipped-creams {
+    position: absolute;
+    top: -12px;
     left: 0;
     width: 100%;
     display: flex;
     justify-content: space-around;
+    z-index: 3;
 }
 
-.cream-piping {
-    width: 16px;
-    height: 16px;
+.whipped-cream {
+    width: 22px;
+    height: 22px;
     background: #ffffff;
     border-radius: 50%;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12);
 }
 
-/* Candles Wrapper - Positioned right on top of top tier */
-.candles-wrapper-2tier {
+.strawberry-top {
+    font-style: normal;
+    font-size: 0.9rem;
+    transform: translateY(-4px);
+}
+
+/* Birthday Topper Flag */
+.cake-topper-flag {
     position: absolute;
-    bottom: 160px;
-    left: 35px;
-    width: 170px;
+    top: -38px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #fff0f5 0%, #ffe5ec 100%);
+    border: 1.5px solid #ff85a2;
+    padding: 3px 12px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #ff85a2;
+    box-shadow: 0 4px 12px rgba(255, 133, 162, 0.3);
+    white-space: nowrap;
+    z-index: 4;
+}
+
+/* Candles Wrapper - Positioned right on top tier (Tier 3) */
+.candles-wrapper {
+    position: absolute;
+    bottom: 188px;
+    left: 67.5px;
+    width: 125px;
     display: flex;
     justify-content: space-around;
-    z-index: 5;
+    z-index: 6;
 }
 
-/* Swaying Candles */
+/* Swaying Luxury Candles */
 .candle {
-    width: 14px;
-    height: 42px;
-    background: repeating-linear-gradient(45deg, #ff9ebb, #ff9ebb 6px, #ffffff 6px, #ffffff 12px);
+    width: 13px;
+    height: 44px;
+    background: repeating-linear-gradient(45deg, #ff85a2, #ff85a2 6px, #ffffff 6px, #ffffff 12px);
     border-radius: 4px 4px 0 0;
     position: relative;
     transform-origin: bottom center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.candle-sway-1 { animation: candleSway1 2.5s infinite ease-in-out alternate; }
-.candle-sway-2 { animation: candleSway2 3.0s infinite ease-in-out alternate; }
-.candle-sway-3 { animation: candleSway3 2.2s infinite ease-in-out alternate; }
+.candle-1 { animation: candleSway1 2.5s infinite ease-in-out alternate; }
+.candle-2 { animation: candleSway2 3.0s infinite ease-in-out alternate; }
+.candle-3 { animation: candleSway3 2.2s infinite ease-in-out alternate; }
 
 @keyframes candleSway1 {
     0% { transform: rotate(-3deg); }
@@ -483,24 +556,36 @@ section {
 .wick {
     width: 2px;
     height: 8px;
-    background: #495057;
+    background: #333333;
     position: absolute;
     top: -8px;
-    left: 6px;
+    left: 5.5px;
 }
 
-/* Multi-layer Flickering Flame */
+/* Multi-layer Flame */
 .flame {
     width: 16px;
     height: 26px;
-    background: radial-gradient(ellipse at bottom, #ffffff 0%, #ffea00 35%, #ff6d00 80%, transparent 100%);
+    background: radial-gradient(ellipse at bottom, #ffea00 0%, #ff6d00 75%, transparent 100%);
     border-radius: 50% 50% 20% 20%;
     position: absolute;
     top: -30px;
-    left: -1px;
+    left: -1.5px;
     box-shadow: 0 0 18px #ffea00, 0 0 35px #ff6d00, 0 0 50px rgba(255, 109, 0, 0.4);
     animation: flameFlicker 0.6s infinite ease-in-out alternate;
     transition: opacity 0.2s ease, transform 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: 2px;
+}
+
+.flame-core {
+    width: 6px;
+    height: 12px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #ffffff;
 }
 
 .flame.flicker-out {
