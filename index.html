@@ -165,14 +165,16 @@
                 </div>
             </div>
 
-            <!-- 2. Text Portrait Canvas Section (Photoshop style - text forms the image) -->
+            <!-- 2. Text Portrait Typography Art Section -->
             <div class="text-art-section">
                 <h3 class="section-subtitle"><i class="fa-solid fa-palette"></i> Bức Họa Ký Tự ✨</h3>
-                <p class="sub-hint">Chân dung ng đẹp được khắc họa bằng hàng nghìn chữ <strong>"Thanh"</strong> xếp chồng lên nhau!</p>
+                <p class="sub-hint">Bức họa chân dung được vẽ tỉ mỉ bằng hàng nghìn chữ <strong>"Thanh"</strong> màu sắc! (Bấm vào ảnh để phóng to chi tiết)</p>
                 
-                <div class="text-portrait-wrapper">
-                    <canvas id="text-portrait-canvas"></canvas>
-                    <p class="portrait-hint">✨ Đang vẽ...</p>
+                <div class="text-portrait-wrapper" id="text-portrait-wrapper">
+                    <img id="text-portrait-img" src="assets/typography_thanh_color.png" alt="Bức họa chữ Thanh" loading="lazy">
+                    <div class="portrait-overlay">
+                        <span class="zoom-badge"><i class="fa-solid fa-magnifying-glass-plus"></i> Bấm để phóng to xem từng chữ</span>
+                    </div>
                 </div>
             </div>
 

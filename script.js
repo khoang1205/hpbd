@@ -569,111 +569,24 @@ function playMusic() {
     }
 }
 
-// ==================== 8. TEXT PORTRAIT CANVAS (PHOTOSHOP STYLE) ====================
+// ==================== 8. TEXT PORTRAIT ART (TYPOGRAPHY PHOTO VIEWER) ====================
 function initTextArt() {
-    const canvas = document.getElementById('text-portrait-canvas');
-    const hint   = document.querySelector('.portrait-hint');
-    if (!canvas) return;
+    const wrapper = document.getElementById('text-portrait-wrapper');
+    const modal = document.getElementById('photo-modal');
+    const modalImg = document.getElementById('modal-img');
+    const modalCaption = document.getElementById('modal-caption');
+    const modalTextArtBox = document.getElementById('modal-text-art-box');
 
-    const portrait = window.THANH_PORTRAIT;
-    if (!portrait) { if (hint) hint.textContent = 'Lỗi dữ liệu.'; return; }
+    if (!wrapper) return;
 
-    const GRID_W = portrait.width;
-    const GRID_H = portrait.height;
-
-    // Decode base64 → Uint8Array luminance
-    const raw = atob(portrait.data);
-    const luma = new Uint8Array(raw.length);
-    for (let i = 0; i < raw.length; i++) luma[i] = raw.charCodeAt(i);
-
-    function getBrightness(x, y) {
-        return luma[y * GRID_W + x] / 255; // 0..1
-    }
-
-    // Canvas size
-    const CANVAS_W = 600;
-    const CANVAS_H = Math.round(CANVAS_W * (GRID_H / GRID_W));
-    canvas.width  = CANVAS_W;
-    canvas.height = CANVAS_H;
-
-    const ctx = canvas.getContext('2d');
-
-    // Dark background
-    ctx.fillStyle = '#0d0d1a';
-    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-
-    const scaleX = CANVAS_W / GRID_W;
-    const scaleY = CANVAS_H / GRID_H;
-
-    const WORD = 'Thanh';
-
-    // Collect subject pixels only (background baked as 255 = skip)
-    const positions = [];
-    for (let sy = 0; sy < GRID_H; sy++) {
-        for (let sx = 0; sx < GRID_W; sx++) {
-            const b = getBrightness(sx, sy);
-            if (b < 0.90) positions.push({ sx, sy, b }); // 0.90 = background cutoff (255/255 ≈ 1.0)
+    wrapper.addEventListener('click', () => {
+        if (modal && modalImg && modalCaption) {
+            if (modalTextArtBox) modalTextArtBox.classList.add('hidden');
+            modalImg.classList.remove('hidden');
+            modalImg.src = 'assets/typography_thanh_color.png';
+            modalCaption.textContent = 'Bức họa chân dung tạo từ hàng nghìn chữ "Thanh" 🌸';
+            modal.classList.remove('hidden-modal');
         }
-    }
-
-    // Shuffle for organic look
-    for (let i = positions.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [positions[i], positions[j]] = [positions[j], positions[i]];
-    }
-
-    // Draw 2 passes: first all pixels lightly, then dark pixels again heavily
-    // This creates the density effect: dark = dense + big, light = sparse + small
-    const drawWord = (sx, sy, b, scale = 1.0) => {
-        const darkness = 1 - b;
-        if (darkness < 0.10) return;
-
-        // Remap: make contrast more dramatic
-        // darkness 0.10 → 0.0 (faint), darkness 0.90 → 1.0 (full)
-        const t = Math.max(0, (darkness - 0.10) / 0.90);
-
-        const fontSize = Math.round((5 + t * 13) * scale);     // 5–18 px
-        const angle    = (Math.random() - 0.5) * 0.7;
-        const alpha    = (0.10 + t * 0.90) * scale;            // 0.10–1.0
-
-        // Color: very dark → bright white-pink; mid-dark → rose pink
-        const lightness = Math.round(70 + t * 30);             // 70–100%
-        const color = `hsl(345, 80%, ${lightness}%)`;
-
-        ctx.save();
-        ctx.globalAlpha = Math.min(1, alpha);
-        ctx.font = `700 ${fontSize}px 'Quicksand', sans-serif`;
-        ctx.fillStyle = color;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.translate((sx + 0.5) * scaleX, (sy + 0.5) * scaleY);
-        ctx.rotate(angle);
-        ctx.fillText(WORD, 0, 0);
-        ctx.restore();
-    };
-
-    // Pass 1: draw every subject pixel (thin density)
-    positions.forEach(({ sx, sy, b }) => drawWord(sx, sy, b, 0.7));
-
-    // Pass 2: draw only dark pixels again (extra density for hair & dress)
-    positions.forEach(({ sx, sy, b }) => {
-        if ((1 - b) > 0.55) drawWord(sx, sy, b, 1.0);
     });
-
-    // Pass 3: heaviest for the darkest pixels (pure black: hair, dress core)
-    positions.forEach(({ sx, sy, b }) => {
-        if ((1 - b) > 0.78) drawWord(sx, sy, b, 1.2);
-    });
-
-    // Vignette
-    const vignette = ctx.createRadialGradient(
-        CANVAS_W/2, CANVAS_H/2, CANVAS_H * 0.20,
-        CANVAS_W/2, CANVAS_H/2, CANVAS_H * 0.70
-    );
-    vignette.addColorStop(0, 'rgba(0,0,0,0)');
-    vignette.addColorStop(1, 'rgba(13,13,26,0.65)');
-    ctx.fillStyle = vignette;
-    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-
-    if (hint) hint.textContent = '✨ Được vẽ bằng hàng nghìn chữ "Thanh" 🌸';
 }
+

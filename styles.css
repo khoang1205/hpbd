@@ -948,32 +948,65 @@ section {
     width: 100%;
 }
 
-/* Text Portrait Canvas (Photoshop-style text portrait) */
+/* Text Portrait Typography Image Display */
 .text-portrait-wrapper {
     width: 100%;
-    max-width: 600px;
-    margin: 16px auto 0;
+    max-width: 520px;
+    margin: 18px auto 0;
     position: relative;
-    border-radius: 18px;
+    border-radius: 20px;
     overflow: hidden;
     background: #0d0d1a;
-    box-shadow: 0 14px 40px rgba(0,0,0,0.35), 0 0 40px rgba(255,133,162,0.12);
-    border: 1.5px solid rgba(255,133,162,0.3);
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.4), 0 0 35px rgba(255, 133, 162, 0.2);
+    border: 2px solid rgba(255, 133, 162, 0.4);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-#text-portrait-canvas {
+.text-portrait-wrapper:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 45px rgba(255, 133, 162, 0.35);
+}
+
+#text-portrait-img {
     display: block;
     width: 100%;
     height: auto;
+    object-fit: contain;
+    transition: filter 0.3s ease;
 }
 
-.portrait-hint {
-    text-align: center;
+.portrait-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 16px 12px;
+    background: linear-gradient(to top, rgba(13, 13, 26, 0.85) 0%, rgba(13, 13, 26, 0) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+.zoom-badge {
+    background: rgba(255, 133, 162, 0.9);
+    color: #fff;
     font-size: 0.85rem;
-    color: rgba(255,133,162,0.7);
-    padding: 8px 0 12px;
-    margin: 0;
     font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(4px);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.text-portrait-wrapper:hover .zoom-badge {
+    transform: scale(1.05);
+    background: #ff6b8b;
 }
 
 
@@ -1166,18 +1199,24 @@ section {
 }
 
 .modal-content {
-    max-width: 550px;
+    max-width: 680px;
+    max-height: 92vh;
     width: 100%;
     text-align: center;
     position: relative;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .modal-content img {
-    width: 100%;
-    max-height: 400px;
-    object-fit: cover;
-    border-radius: 12px;
-    margin-bottom: 15px;
+    max-width: 100%;
+    max-height: 78vh;
+    object-fit: contain;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .close-btn {
