@@ -575,8 +575,24 @@ function initTextArt() {
     const hint   = document.querySelector('.portrait-hint');
     if (!canvas) return;
 
+    const portrait = window.THANH_PORTRAIT;
+    if (!portrait) { if (hint) hint.textContent = 'Lỗi dữ liệu.'; return; }
+
+    const GRID_W = portrait.width;
+    const GRID_H = portrait.height;
+
+    // Decode base64 → Uint8Array luminance
+    const raw = atob(portrait.data);
+    const luma = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) luma[i] = raw.charCodeAt(i);
+
+    function getBrightness(x, y) {
+        return luma[y * GRID_W + x] / 255; // 0..1
+    }
+
+    // Canvas size
     const CANVAS_W = 600;
-    const CANVAS_H = 800;
+    const CANVAS_H = Math.round(CANVAS_W * (GRID_H / GRID_W));
     canvas.width  = CANVAS_W;
     canvas.height = CANVAS_H;
 
@@ -586,104 +602,65 @@ function initTextArt() {
     ctx.fillStyle = '#0d0d1a';
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
-    // Load portrait image
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = 'assets/thanh.png';
+    const scaleX = CANVAS_W / GRID_W;
+    const scaleY = CANVAS_H / GRID_H;
 
-    img.onload = () => {
-        // ---- Step 1: sample the image into a small grid ----
-        const SAMPLE_W = 120;
-        const SAMPLE_H = Math.round(SAMPLE_W * (img.height / img.width));
+    const WORD = 'Thanh';
 
-        const offscreen = document.createElement('canvas');
-        offscreen.width  = SAMPLE_W;
-        offscreen.height = SAMPLE_H;
-        const octx = offscreen.getContext('2d');
-
-        // Crop: focus on the subject (skip top 32% which is mostly background)
-        const cropStartY = Math.floor(img.height * 0.32);
-        const cropH = img.height - cropStartY;
-        octx.drawImage(img, 0, cropStartY, img.width, cropH,
-                            0, 0, SAMPLE_W, SAMPLE_H);
-
-        const pixels = octx.getImageData(0, 0, SAMPLE_W, SAMPLE_H).data;
-
-        function lum(x, y) {
-            const i = (y * SAMPLE_W + x) * 4;
-            return (0.299 * pixels[i] + 0.587 * pixels[i+1] + 0.114 * pixels[i+2]) / 255;
+    // Collect all dark pixels
+    const positions = [];
+    for (let sy = 0; sy < GRID_H; sy++) {
+        for (let sx = 0; sx < GRID_W; sx++) {
+            const b = getBrightness(sx, sy);
+            if (b < 0.58) positions.push({ sx, sy, b });
         }
+    }
 
-        // ---- Step 2: draw "Thanh" words scattered over dark-pixel areas ----
-        const WORD = 'Thanh';
-        const scaleX = CANVAS_W / SAMPLE_W;
-        const scaleY = CANVAS_H / SAMPLE_H;
+    // Shuffle for organic look
+    for (let i = positions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [positions[i], positions[j]] = [positions[j], positions[i]];
+    }
 
-        // Shuffle sampling order for organic look
-        const positions = [];
-        for (let sy = 0; sy < SAMPLE_H; sy++) {
-            for (let sx = 0; sx < SAMPLE_W; sx++) {
-                const b = lum(sx, sy);
-                if (b < 0.55) {                     // only dark/mid-tone pixels
-                    positions.push({ sx, sy, b });
-                }
-            }
-        }
-        // Shuffle
-        for (let i = positions.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [positions[i], positions[j]] = [positions[j], positions[i]];
-        }
+    const drawn = new Set();
 
-        // Draw words – density driven by brightness (darker = more words)
-        const drawn = new Set();
-        const STEP = 2; // sample step (lower = denser)
+    positions.forEach(({ sx, sy, b }) => {
+        const darkness = 1 - b;
+        if (darkness < 0.32) return; // skip near-white
 
-        positions.forEach(({ sx, sy, b }) => {
-            // Skip some cells to avoid total overcrowding
-            const key = `${Math.floor(sx/STEP)}_${Math.floor(sy/STEP)}`;
-            if (drawn.has(key)) return;
-            drawn.add(key);
+        // De-duplicate by cell to avoid overcrowding
+        const key = `${Math.floor(sx/2)}_${Math.floor(sy/2)}`;
+        if (drawn.has(key)) return;
+        drawn.add(key);
 
-            // Font size: small for lighter pixels, bigger for very dark (hair/dress)
-            const darkness = 1 - b;               // 0..1, higher = darker
-            const skip = darkness < 0.30;          // skip very light areas
-            if (skip) return;
+        const fontSize = Math.round(6 + darkness * 9); // 6–15 px
+        const angle    = (Math.random() - 0.5) * 0.55; // slight rotation
+        const alpha    = 0.30 + darkness * 0.70;        // brighter where darker
 
-            const fontSize = Math.round(7 + darkness * 8); // 7–15 px
-            const angle = (Math.random() - 0.5) * 0.6;     // ±0.3 rad rotation
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.font = `600 ${fontSize}px 'Quicksand', sans-serif`;
+        ctx.fillStyle = '#ff85a2';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
 
-            // Pink-to-white based on darkness
-            const alpha = 0.35 + darkness * 0.65;
-            ctx.save();
-            ctx.globalAlpha = alpha;
-            ctx.font = `${fontSize}px 'Quicksand', sans-serif`;
-            ctx.fillStyle = '#ff85a2';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
+        const cx = (sx + 0.5) * scaleX;
+        const cy = (sy + 0.5) * scaleY;
+        ctx.translate(cx, cy);
+        ctx.rotate(angle);
+        ctx.fillText(WORD, 0, 0);
+        ctx.restore();
+    });
 
-            const cx = (sx + 0.5) * scaleX;
-            const cy = (sy + 0.5) * scaleY;
-            ctx.translate(cx, cy);
-            ctx.rotate(angle);
-            ctx.fillText(WORD, 0, 0);
-            ctx.restore();
-        });
+    // Vignette
+    const vignette = ctx.createRadialGradient(
+        CANVAS_W/2, CANVAS_H/2, CANVAS_H * 0.22,
+        CANVAS_W/2, CANVAS_H/2, CANVAS_H * 0.72
+    );
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, 'rgba(13,13,26,0.70)');
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
-        // Subtle pink vignette glow around edges
-        const vignette = ctx.createRadialGradient(
-            CANVAS_W/2, CANVAS_H/2, CANVAS_H * 0.25,
-            CANVAS_W/2, CANVAS_H/2, CANVAS_H * 0.75
-        );
-        vignette.addColorStop(0, 'rgba(0,0,0,0)');
-        vignette.addColorStop(1, 'rgba(13,13,26,0.65)');
-        ctx.fillStyle = vignette;
-        ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-
-        if (hint) hint.textContent = '✨ Được vẽ bằng hàng nghìn chữ "Thanh" 🌸';
-    };
-
-    img.onerror = () => {
-        if (hint) hint.textContent = 'Không tải được ảnh.';
-    };
+    if (hint) hint.textContent = '✨ Được vẽ bằng hàng nghìn chữ "Thanh" 🌸';
 }
