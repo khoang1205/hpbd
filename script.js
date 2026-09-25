@@ -622,43 +622,56 @@ function initTextArt() {
         [positions[i], positions[j]] = [positions[j], positions[i]];
     }
 
-    const drawn = new Set();
-
-    positions.forEach(({ sx, sy, b }) => {
+    // Draw 2 passes: first all pixels lightly, then dark pixels again heavily
+    // This creates the density effect: dark = dense + big, light = sparse + small
+    const drawWord = (sx, sy, b, scale = 1.0) => {
         const darkness = 1 - b;
-        if (darkness < 0.12) return; // only skip near-255 background leftovers
+        if (darkness < 0.10) return;
 
-        // De-duplicate by cell to avoid overcrowding
-        const key = `${Math.floor(sx/2)}_${Math.floor(sy/2)}`;
-        if (drawn.has(key)) return;
-        drawn.add(key);
+        // Remap: make contrast more dramatic
+        // darkness 0.10 → 0.0 (faint), darkness 0.90 → 1.0 (full)
+        const t = Math.max(0, (darkness - 0.10) / 0.90);
 
-        const fontSize = Math.round(6 + darkness * 9); // 6–15 px
-        const angle    = (Math.random() - 0.5) * 0.55; // slight rotation
-        const alpha    = 0.30 + darkness * 0.70;        // brighter where darker
+        const fontSize = Math.round((5 + t * 13) * scale);     // 5–18 px
+        const angle    = (Math.random() - 0.5) * 0.7;
+        const alpha    = (0.10 + t * 0.90) * scale;            // 0.10–1.0
+
+        // Color: very dark → bright white-pink; mid-dark → rose pink
+        const lightness = Math.round(70 + t * 30);             // 70–100%
+        const color = `hsl(345, 80%, ${lightness}%)`;
 
         ctx.save();
-        ctx.globalAlpha = alpha;
-        ctx.font = `600 ${fontSize}px 'Quicksand', sans-serif`;
-        ctx.fillStyle = '#ff85a2';
+        ctx.globalAlpha = Math.min(1, alpha);
+        ctx.font = `700 ${fontSize}px 'Quicksand', sans-serif`;
+        ctx.fillStyle = color;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-
-        const cx = (sx + 0.5) * scaleX;
-        const cy = (sy + 0.5) * scaleY;
-        ctx.translate(cx, cy);
+        ctx.translate((sx + 0.5) * scaleX, (sy + 0.5) * scaleY);
         ctx.rotate(angle);
         ctx.fillText(WORD, 0, 0);
         ctx.restore();
+    };
+
+    // Pass 1: draw every subject pixel (thin density)
+    positions.forEach(({ sx, sy, b }) => drawWord(sx, sy, b, 0.7));
+
+    // Pass 2: draw only dark pixels again (extra density for hair & dress)
+    positions.forEach(({ sx, sy, b }) => {
+        if ((1 - b) > 0.55) drawWord(sx, sy, b, 1.0);
+    });
+
+    // Pass 3: heaviest for the darkest pixels (pure black: hair, dress core)
+    positions.forEach(({ sx, sy, b }) => {
+        if ((1 - b) > 0.78) drawWord(sx, sy, b, 1.2);
     });
 
     // Vignette
     const vignette = ctx.createRadialGradient(
-        CANVAS_W/2, CANVAS_H/2, CANVAS_H * 0.22,
-        CANVAS_W/2, CANVAS_H/2, CANVAS_H * 0.72
+        CANVAS_W/2, CANVAS_H/2, CANVAS_H * 0.20,
+        CANVAS_W/2, CANVAS_H/2, CANVAS_H * 0.70
     );
     vignette.addColorStop(0, 'rgba(0,0,0,0)');
-    vignette.addColorStop(1, 'rgba(13,13,26,0.70)');
+    vignette.addColorStop(1, 'rgba(13,13,26,0.65)');
     ctx.fillStyle = vignette;
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
