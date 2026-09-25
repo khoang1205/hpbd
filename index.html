@@ -10,6 +10,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Three.js 3D WebGL Library & OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
     <!-- Canvas Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <!-- GSAP for smooth animations -->
@@ -51,76 +56,17 @@
         </div>
     </section>
 
-    <!-- ==================== SECTION 2: LUXURY PASTEL BIRTHDAY CAKE ==================== -->
+    <!-- ==================== SECTION 2: INTERACTIVE 3D WEBGL CAKE ==================== -->
     <section id="cake-section" class="hidden-section">
         <div class="glass-card cake-card center-content">
             <div class="pastel-badge">Ước một điều ước nào ng đẹp ơi! ✨</div>
             <h1 class="celebration-heading">Chúc Mừng Sinh Nhật <span id="recipient-name-cake"></span>! 🌸</h1>
             
-            <!-- Ultra Aesthetic 3-Tier Pastel Cake -->
-            <div class="cake-container">
-                <div class="cake-glow-aura" id="cake-aura"></div>
-                
-                <div class="luxury-cake">
-                    <!-- Glass Pedestal Plate -->
-                    <div class="cake-plate"></div>
-                    
-                    <!-- Tier 1: Bottom Layer (Strawberry Velvet) -->
-                    <div class="cake-tier tier-1">
-                        <div class="icing-wave drip-1"></div>
-                        <div class="pearl-sprinkles">
-                            <span class="pearl p1"></span><span class="pearl p2"></span><span class="pearl p3"></span>
-                            <span class="pearl p4"></span><span class="pearl p5"></span>
-                        </div>
-                    </div>
-
-                    <!-- Tier 2: Middle Layer (Lavender Dream) -->
-                    <div class="cake-tier tier-2">
-                        <div class="icing-wave drip-2"></div>
-                        <div class="pearl-sprinkles">
-                            <span class="pearl p6"></span><span class="pearl p7"></span><span class="pearl p8"></span>
-                        </div>
-                    </div>
-
-                    <!-- Tier 3: Top Layer (Vanilla Soft Frosting) -->
-                    <div class="cake-tier tier-3">
-                        <div class="icing-wave drip-3"></div>
-                        <!-- Whipped Cream Swirls & Toppings -->
-                        <div class="whipped-creams">
-                            <span class="whipped-cream c1"><i class="strawberry-top">🍓</i></span>
-                            <span class="whipped-cream c2"><i class="strawberry-top">🍓</i></span>
-                            <span class="whipped-cream c3"><i class="strawberry-top">🍓</i></span>
-                        </div>
-                        <!-- Mini Birthday Topper Flag -->
-                        <div class="cake-topper-flag">
-                            <span>✨ 09/10 ✨</span>
-                        </div>
-                    </div>
-
-                    <!-- 3 Swaying & Flickering Luxury Candles -->
-                    <div class="candles-wrapper">
-                        <div class="candle candle-1">
-                            <div class="wick"></div>
-                            <div class="flame" id="flame-1">
-                                <div class="flame-core"></div>
-                            </div>
-                            <div class="smoke" id="smoke-1"></div>
-                        </div>
-                        <div class="candle candle-2">
-                            <div class="wick"></div>
-                            <div class="flame" id="flame-2">
-                                <div class="flame-core"></div>
-                            </div>
-                            <div class="smoke" id="smoke-2"></div>
-                        </div>
-                        <div class="candle candle-3">
-                            <div class="wick"></div>
-                            <div class="flame" id="flame-3">
-                                <div class="flame-core"></div>
-                            </div>
-                            <div class="smoke" id="smoke-3"></div>
-                        </div>
-                    </div>
+            <!-- 3D Interactive WebGL Canvas Container -->
+            <div class="cake-container-3d">
+                <div id="three-canvas-holder"></div>
+                <div class="rotate-3d-hint">
+                    <i class="fa-solid fa-hand-pointer"></i> Di chuột/chạm ngón tay để xoay bánh 3D 360°
                 </div>
             </div>
 
