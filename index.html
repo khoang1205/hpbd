@@ -206,22 +206,20 @@
         </footer>
     </section>
 
-    <!-- Modal image/text art preview -->
+    <!-- Modal image/text art preview with interactive Pinch/Zoom -->
     <div id="photo-modal" class="modal hidden-modal">
+        <div class="modal-backdrop-overlay" id="modal-backdrop"></div>
         <div class="modal-content glass-card">
-            <span id="close-modal" class="close-btn">&times;</span>
-            <div id="modal-text-art-box" class="hidden text-art-box">
-                <div class="text-art-header">
-                    <span class="dot red"></span>
-                    <span class="dot yellow"></span>
-                    <span class="dot green"></span>
-                    <span class="file-title"></span>
-                </div>
-                <div class="text-art-content-wrapper">
-                    <pre id="modal-text-art" class="text-art-pre"></pre>
-                </div>
+            <button id="close-modal" class="close-btn" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-zoom-toolbar">
+                <button id="modal-zoom-in" class="zoom-tool-btn" type="button" title="Phóng to"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                <button id="modal-zoom-out" class="zoom-tool-btn" type="button" title="Thu nhỏ"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                <button id="modal-zoom-reset" class="zoom-tool-btn" type="button" title="Đặt lại"><i class="fa-solid fa-arrows-rotate"></i></button>
             </div>
-            <img id="modal-img" src="" alt="Photo Preview">
+            <div id="modal-image-viewport" class="modal-image-viewport">
+                <img id="modal-img" src="" alt="Photo Preview" draggable="false">
+            </div>
+            <p class="modal-zoom-instruction"><i class="fa-solid fa-hand-pointer"></i> Dùng 2 ngón tay thu phóng hoặc chạm đúp để xem chi tiết từng chữ</p>
             <p id="modal-caption" class="modal-caption"></p>
         </div>
     </div>

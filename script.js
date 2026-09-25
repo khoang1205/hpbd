@@ -24,7 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 7. Setup Text Art Generator (Made of "Thanh ")
     initTextArt();
 
-    // 8. Setup Music Controller
+    // 8. Setup Photo Modal & Interactive Zoom Lightbox
+    initPhotoModal();
+
+    // 9. Setup Music Controller
     initMusicPlayer();
 });
 
@@ -328,11 +331,6 @@ function fireCelebrationConfetti() {
 // ==================== 5. POLAROID PHOTO GALLERY ====================
 function initPolaroidGallery() {
     const grid = document.getElementById('polaroid-grid');
-    const modal = document.getElementById('photo-modal');
-    const modalImg = document.getElementById('modal-img');
-    const modalCaption = document.getElementById('modal-caption');
-    const closeModal = document.getElementById('close-modal');
-
     if (!grid) return;
 
     // Direct user message if photos array is empty
@@ -370,62 +368,22 @@ function initPolaroidGallery() {
         const rotation = (Math.random() * 8 - 4).toFixed(1);
         card.style.setProperty('--rotation', rotation);
 
-        if (photo.isTextArt || !photo.url) {
-            const artText = window.THANH_TEXT_ART || "Thanh Thanh Thanh...";
-            card.innerHTML = `
-                <div class="polaroid-tape"></div>
-                <div class="polaroid-img-box text-art-img-box">
-                    <pre class="polaroid-text-art">${artText}</pre>
-                </div>
-                <div class="polaroid-caption">${photo.caption || "ng đẹp ✨"}</div>
-            `;
+        card.innerHTML = `
+            <div class="polaroid-tape"></div>
+            <div class="polaroid-img-box">
+                <img src="${photo.url}" alt="Memory ${idx + 1}" loading="lazy">
+            </div>
+            <div class="polaroid-caption">${photo.caption}</div>
+        `;
 
-            card.addEventListener('click', () => {
-                const modalTextArtBox = document.getElementById('modal-text-art-box');
-                const modalTextArt = document.getElementById('modal-text-art');
-                if (modal && modalCaption) {
-                    if (modalImg) modalImg.classList.add('hidden');
-                    if (modalTextArtBox && modalTextArt) {
-                        modalTextArt.textContent = artText;
-                        modalTextArtBox.classList.remove('hidden');
-                    }
-                    modalCaption.textContent = photo.caption || "ng đẹp ✨";
-                    modal.classList.remove('hidden-modal');
-                }
-            });
-        } else {
-            card.innerHTML = `
-                <div class="polaroid-tape"></div>
-                <div class="polaroid-img-box">
-                    <img src="${photo.url}" alt="Memory ${idx + 1}" loading="lazy">
-                </div>
-                <div class="polaroid-caption">${photo.caption}</div>
-            `;
-
-            card.addEventListener('click', () => {
-                const modalTextArtBox = document.getElementById('modal-text-art-box');
-                if (modal && modalImg && modalCaption) {
-                    if (modalTextArtBox) modalTextArtBox.classList.add('hidden');
-                    modalImg.classList.remove('hidden');
-                    modalImg.src = photo.url;
-                    modalCaption.textContent = photo.caption;
-                    modal.classList.remove('hidden-modal');
-                }
-            });
-        }
+        card.addEventListener('click', () => {
+            if (typeof openPhotoModal === 'function') {
+                openPhotoModal(photo.url, photo.caption);
+            }
+        });
 
         grid.appendChild(card);
     });
-
-    if (closeModal && modal) {
-        closeModal.addEventListener('click', () => {
-            modal.classList.add('hidden-modal');
-        });
-
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) modal.classList.add('hidden-modal');
-        });
-    }
 }
 
 // ==================== 6. SCRATCH CARD CANVAS ====================
@@ -572,21 +530,227 @@ function playMusic() {
 // ==================== 8. TEXT PORTRAIT ART (TYPOGRAPHY PHOTO VIEWER) ====================
 function initTextArt() {
     const wrapper = document.getElementById('text-portrait-wrapper');
-    const modal = document.getElementById('photo-modal');
-    const modalImg = document.getElementById('modal-img');
-    const modalCaption = document.getElementById('modal-caption');
-    const modalTextArtBox = document.getElementById('modal-text-art-box');
-
     if (!wrapper) return;
 
     wrapper.addEventListener('click', () => {
-        if (modal && modalImg && modalCaption) {
-            if (modalTextArtBox) modalTextArtBox.classList.add('hidden');
-            modalImg.classList.remove('hidden');
-            modalImg.src = 'assets/typography_thanh_color.png';
-            modalCaption.textContent = 'Bức họa chân dung tạo từ hàng nghìn chữ "Thanh" 🌸';
-            modal.classList.remove('hidden-modal');
+        if (typeof openPhotoModal === 'function') {
+            openPhotoModal('assets/typography_thanh_color.png', 'Bức họa chân dung tạo từ hàng nghìn chữ "Thanh" 🌸');
         }
     });
+}
+
+// ==================== 9. PHOTO MODAL WITH PINCH-ZOOM & PAN ====================
+let openPhotoModal = null;
+let closePhotoModal = null;
+
+function initPhotoModal() {
+    const modal = document.getElementById('photo-modal');
+    const modalBackdrop = document.getElementById('modal-backdrop');
+    const closeModalBtn = document.getElementById('close-modal');
+    const modalImg = document.getElementById('modal-img');
+    const modalCaption = document.getElementById('modal-caption');
+    const modalViewport = document.getElementById('modal-image-viewport');
+    const zoomInBtn = document.getElementById('modal-zoom-in');
+    const zoomOutBtn = document.getElementById('modal-zoom-out');
+    const zoomResetBtn = document.getElementById('modal-zoom-reset');
+
+    if (!modal || !modalImg) return;
+
+    let scale = 1.0;
+    let translateX = 0;
+    let translateY = 0;
+    const MIN_SCALE = 1.0;
+    const MAX_SCALE = 6.0;
+
+    function updateTransform(smooth = true) {
+        if (!modalImg) return;
+        modalImg.style.transition = smooth ? 'transform 0.15s ease-out' : 'none';
+        modalImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        
+        if (modalViewport) {
+            if (scale > 1.05) {
+                modalViewport.style.cursor = 'grab';
+            } else {
+                modalViewport.style.cursor = 'default';
+                translateX = 0;
+                translateY = 0;
+            }
+        }
+    }
+
+    function resetZoom() {
+        scale = 1.0;
+        translateX = 0;
+        translateY = 0;
+        updateTransform(true);
+    }
+
+    openPhotoModal = function(src, caption = '') {
+        modalImg.src = src;
+        if (modalCaption) modalCaption.textContent = caption;
+        resetZoom();
+        modal.classList.remove('hidden-modal');
+        document.body.style.overflow = 'hidden';
+    };
+
+    closePhotoModal = function() {
+        modal.classList.add('hidden-modal');
+        document.body.style.overflow = '';
+        resetZoom();
+    };
+
+    // Close button events (Click & Touch)
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closePhotoModal();
+        });
+        closeModalBtn.addEventListener('touchend', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            closePhotoModal();
+        });
+    }
+
+    // Backdrop click event
+    if (modalBackdrop) {
+        modalBackdrop.addEventListener('click', closePhotoModal);
+        modalBackdrop.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            closePhotoModal();
+        });
+    }
+
+    // Modal wrapper click fallback
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closePhotoModal();
+    });
+
+    // Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden-modal')) {
+            closePhotoModal();
+        }
+    });
+
+    // Zoom Toolbar buttons
+    if (zoomInBtn) {
+        zoomInBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            scale = Math.min(MAX_SCALE, scale + 0.6);
+            updateTransform(true);
+        });
+    }
+    if (zoomOutBtn) {
+        zoomOutBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            scale = Math.max(MIN_SCALE, scale - 0.6);
+            if (scale <= 1.05) resetZoom();
+            else updateTransform(true);
+        });
+    }
+    if (zoomResetBtn) {
+        zoomResetBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            resetZoom();
+        });
+    }
+
+    // Touch & Mouse Interactive Zoom / Pan
+    if (modalViewport) {
+        let isDragging = false;
+        let startX = 0, startY = 0;
+        let lastTap = 0;
+        let initialPinchDist = 0;
+        let initialScale = 1.0;
+
+        // Double tap on mobile / click on desktop to toggle zoom
+        modalViewport.addEventListener('click', (e) => {
+            const now = Date.now();
+            if (now - lastTap < 320) {
+                if (scale > 1.2) {
+                    resetZoom();
+                } else {
+                    scale = 2.8;
+                    updateTransform(true);
+                }
+            }
+            lastTap = now;
+        });
+
+        // Touch event handlers (Pinch to zoom + 1 finger drag)
+        modalViewport.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                // Pinch start
+                const t1 = e.touches[0];
+                const t2 = e.touches[1];
+                initialPinchDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+                initialScale = scale;
+            } else if (e.touches.length === 1 && scale > 1.05) {
+                // Pan start
+                isDragging = true;
+                startX = e.touches[0].clientX - translateX;
+                startY = e.touches[0].clientY - translateY;
+            }
+        }, { passive: false });
+
+        modalViewport.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && initialPinchDist > 0) {
+                e.preventDefault();
+                const t1 = e.touches[0];
+                const t2 = e.touches[1];
+                const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+                const newScale = initialScale * (dist / initialPinchDist);
+                scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, newScale));
+                updateTransform(false);
+            } else if (e.touches.length === 1 && isDragging && scale > 1.05) {
+                e.preventDefault();
+                translateX = e.touches[0].clientX - startX;
+                translateY = e.touches[0].clientY - startY;
+                updateTransform(false);
+            }
+        }, { passive: false });
+
+        modalViewport.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) initialPinchDist = 0;
+            if (e.touches.length === 0) {
+                isDragging = false;
+                if (scale < 1.05) resetZoom();
+            }
+        });
+
+        // Desktop Mouse Drag & Wheel Zoom
+        modalViewport.addEventListener('mousedown', (e) => {
+            if (scale > 1.05) {
+                isDragging = true;
+                startX = e.clientX - translateX;
+                startY = e.clientY - translateY;
+                modalViewport.classList.add('is-dragging');
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isDragging && scale > 1.05) {
+                translateX = e.clientX - startX;
+                translateY = e.clientY - startY;
+                updateTransform(false);
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                modalViewport.classList.remove('is-dragging');
+            }
+        });
+
+        modalViewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.3 : 0.3;
+            scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale + delta));
+            if (scale <= 1.05) resetZoom();
+            else updateTransform(true);
+        }, { passive: false });
+    }
 }
 
