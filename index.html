@@ -10,11 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Three.js 3D WebGL Library & OrbitControls -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    
     <!-- Canvas Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <!-- GSAP for smooth animations -->
@@ -56,17 +51,65 @@
         </div>
     </section>
 
-    <!-- ==================== SECTION 2: INTERACTIVE 3D WEBGL CAKE ==================== -->
+    <!-- ==================== SECTION 2: KAWAII PASTEL 2D BIRTHDAY CAKE ==================== -->
     <section id="cake-section" class="hidden-section">
         <div class="glass-card cake-card center-content">
             <div class="pastel-badge">Ước một điều ước nào ng đẹp ơi! ✨</div>
             <h1 class="celebration-heading">Chúc Mừng Sinh Nhật <span id="recipient-name-cake"></span>! 🌸</h1>
             
-            <!-- 3D Interactive WebGL Canvas Container -->
-            <div class="cake-container-3d">
-                <div id="three-canvas-holder"></div>
-                <div class="rotate-3d-hint">
-                    <i class="fa-solid fa-hand-pointer"></i> Di chuột/chạm ngón tay để xoay bánh 3D 360°
+            <!-- Kawaii Pastel 2D Cake Illustration -->
+            <div class="cake-container-2d">
+                <div class="cake-glow-aura" id="cake-aura"></div>
+                
+                <div class="kawaii-cake">
+                    <div class="cake-plate-2d"></div>
+                    
+                    <!-- Bottom Tier -->
+                    <div class="tier-2d bottom-tier">
+                        <div class="scallop-drips">
+                            <span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span>
+                        </div>
+                        <div class="cherry-decorations">
+                            <span class="dot-cherry"></span><span class="dot-cherry"></span><span class="dot-cherry"></span>
+                        </div>
+                    </div>
+
+                    <!-- Top Tier -->
+                    <div class="tier-2d top-tier">
+                        <div class="scallop-drips">
+                            <span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span>
+                        </div>
+                        <!-- Strawberry Toppings on Top Tier -->
+                        <div class="strawberry-toppings">
+                            <span class="strawberry-item">🍓</span>
+                            <span class="strawberry-item">🍓</span>
+                            <span class="strawberry-item">🍓</span>
+                        </div>
+                    </div>
+
+                    <!-- 3 Candles securely placed on Top Tier -->
+                    <div class="candles-container-2d">
+                        <div class="candle-2d c-left">
+                            <div class="wick-2d"></div>
+                            <div class="flame-2d" id="flame-1"></div>
+                            <div class="smoke-2d" id="smoke-1"></div>
+                        </div>
+                        <div class="candle-2d c-center">
+                            <div class="wick-2d"></div>
+                            <div class="flame-2d" id="flame-2"></div>
+                            <div class="smoke-2d" id="smoke-2"></div>
+                        </div>
+                        <div class="candle-2d c-right">
+                            <div class="wick-2d"></div>
+                            <div class="flame-2d" id="flame-3"></div>
+                            <div class="smoke-2d" id="smoke-3"></div>
+                        </div>
+                    </div>
+
+                    <!-- Cake Banner Badge -->
+                    <div class="cake-banner-2d">
+                        ✨ 09/10 ✨
+                    </div>
                 </div>
             </div>
 

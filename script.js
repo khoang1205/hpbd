@@ -1,5 +1,5 @@
 // ===================================================
-// PASTEL BIRTHDAY WEBSITE - INTERACTIVE LOGIC (3D WEBGL EDITION)
+// PASTEL BIRTHDAY WEBSITE - INTERACTIVE LOGIC (KAWAII 2D EDITION)
 // ===================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -164,213 +164,13 @@ function switchSection(fromId, toId) {
                 toEl.classList.add('active-section');
                 gsap.fromTo(toEl, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.6 });
 
-                // Dim room ambient light for 3D cake candle moment
-                if (toId === 'cake-section') {
-                    if (roomOverlay) roomOverlay.classList.add('dimmed');
-                    // Initialize Three.js 3D WebGL Scene
-                    setTimeout(init3DCakeScene, 100);
+                // Dim room ambient light for birthday cake candle moment
+                if (toId === 'cake-section' && roomOverlay) {
+                    roomOverlay.classList.add('dimmed');
                 }
             }
         });
     }
-}
-
-// ==================== 3D THREE.JS WEBGL SCENE SETUP ====================
-let scene3D, camera3D, renderer3D, controls3D;
-let flames3D = [];
-let flameLights3D = [];
-let is3DCakeInitialized = false;
-
-function init3DCakeScene() {
-    if (is3DCakeInitialized) return;
-    const holder = document.getElementById('three-canvas-holder');
-    if (!holder || typeof THREE === 'undefined') return;
-
-    is3DCakeInitialized = true;
-    const width = holder.clientWidth || 400;
-    const height = holder.clientHeight || 280;
-
-    // 1. Scene
-    scene3D = new THREE.Scene();
-
-    // 2. Camera
-    camera3D = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
-    camera3D.position.set(0, 3.8, 9.2);
-
-    // 3. Renderer
-    renderer3D = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer3D.setSize(width, height);
-    renderer3D.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer3D.shadowMap.enabled = true;
-    holder.appendChild(renderer3D.domElement);
-
-    // 4. OrbitControls for 360 Rotation
-    if (typeof THREE.OrbitControls !== 'undefined') {
-        controls3D = new THREE.OrbitControls(camera3D, renderer3D.domElement);
-        controls3D.enableDamping = true;
-        controls3D.dampingFactor = 0.05;
-        controls3D.autoRotate = true;
-        controls3D.autoRotateSpeed = 1.0;
-        controls3D.maxPolarAngle = Math.PI / 2 + 0.05;
-        controls3D.minDistance = 5;
-        controls3D.maxDistance = 14;
-    }
-
-    // 5. Lights
-    const ambientLight = new THREE.AmbientLight(0xfff5f8, 0.95);
-    scene3D.add(ambientLight);
-
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.1);
-    dirLight.position.set(5, 10, 7);
-    dirLight.castShadow = true;
-    scene3D.add(dirLight);
-
-    const softFillLight = new THREE.PointLight(0xff85a2, 0.6, 20);
-    softFillLight.position.set(-5, 5, -5);
-    scene3D.add(softFillLight);
-
-    // 6. Build 3D Cake Group
-    const cakeGroup = new THREE.Group();
-    cakeGroup.position.y = -1.1;
-
-    // Glass Pedestal Plate
-    const plateGeo = new THREE.CylinderGeometry(3.6, 3.8, 0.18, 64);
-    const plateMat = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        roughness: 0.1,
-        metalness: 0.2,
-        transparent: true,
-        opacity: 0.88
-    });
-    const plateMesh = new THREE.Mesh(plateGeo, plateMat);
-    plateMesh.position.y = 0;
-    cakeGroup.add(plateMesh);
-
-    // Tier 1 (Bottom - Strawberry Pink)
-    const t1Geo = new THREE.CylinderGeometry(2.8, 2.9, 1.2, 64);
-    const t1Mat = new THREE.MeshStandardMaterial({ color: 0xff85a2, roughness: 0.35 });
-    const t1Mesh = new THREE.Mesh(t1Geo, t1Mat);
-    t1Mesh.position.y = 0.7;
-    cakeGroup.add(t1Mesh);
-
-    // Tier 1 Cream Rim
-    const rim1Geo = new THREE.TorusGeometry(2.82, 0.08, 16, 64);
-    const creamMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 });
-    const rim1Mesh = new THREE.Mesh(rim1Geo, creamMat);
-    rim1Mesh.rotation.x = Math.PI / 2;
-    rim1Mesh.position.y = 1.3;
-    cakeGroup.add(rim1Mesh);
-
-    // Tier 2 (Middle - Lavender)
-    const t2Geo = new THREE.CylinderGeometry(2.0, 2.1, 1.0, 64);
-    const t2Mat = new THREE.MeshStandardMaterial({ color: 0xc8b6ff, roughness: 0.35 });
-    const t2Mesh = new THREE.Mesh(t2Geo, t2Mat);
-    t2Mesh.position.y = 1.8;
-    cakeGroup.add(t2Mesh);
-
-    // Tier 2 Cream Rim
-    const rim2Geo = new THREE.TorusGeometry(2.02, 0.07, 16, 64);
-    const rim2Mesh = new THREE.Mesh(rim2Geo, creamMat);
-    rim2Mesh.rotation.x = Math.PI / 2;
-    rim2Mesh.position.y = 2.3;
-    cakeGroup.add(rim2Mesh);
-
-    // Tier 3 (Top - Vanilla Cream)
-    const t3Geo = new THREE.CylinderGeometry(1.3, 1.4, 0.9, 64);
-    const t3Mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25 });
-    const t3Mesh = new THREE.Mesh(t3Geo, t3Mat);
-    t3Mesh.position.y = 2.75;
-    cakeGroup.add(t3Mesh);
-
-    // 3D Strawberries on Top Tier
-    const strawGeo = new THREE.ConeGeometry(0.18, 0.35, 16);
-    const strawMat = new THREE.MeshStandardMaterial({ color: 0xff4d6d, roughness: 0.3 });
-    const strawPos = [
-        { x: -0.75, z: 0.4 },
-        { x: 0.75, z: 0.4 },
-        { x: 0, z: -0.85 }
-    ];
-
-    strawPos.forEach(p => {
-        const s = new THREE.Mesh(strawGeo, strawMat);
-        s.position.set(p.x, 3.35, p.z);
-        s.rotation.z = 0.1;
-        cakeGroup.add(s);
-    });
-
-    // 3D Candles & Flames
-    const candlePos = [
-        { x: -0.5, z: -0.2 },
-        { x: 0.5, z: -0.2 },
-        { x: 0, z: 0.45 }
-    ];
-
-    const candleGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.8, 32);
-    const candleMat = new THREE.MeshStandardMaterial({ color: 0xffb3c6, roughness: 0.4 });
-    const flameGeo = new THREE.ConeGeometry(0.12, 0.3, 16);
-    const flameMat = new THREE.MeshBasicMaterial({ color: 0xffea00 });
-
-    candlePos.forEach((p, idx) => {
-        // Candle stick
-        const candleMesh = new THREE.Mesh(candleGeo, candleMat);
-        candleMesh.position.set(p.x, 3.6, p.z);
-        cakeGroup.add(candleMesh);
-
-        // Wick
-        const wickGeo = new THREE.CylinderGeometry(0.015, 0.015, 0.12, 8);
-        const wickMat = new THREE.MeshBasicMaterial({ color: 0x333333 });
-        const wickMesh = new THREE.Mesh(wickGeo, wickMat);
-        wickMesh.position.set(p.x, 4.05, p.z);
-        cakeGroup.add(wickMesh);
-
-        // 3D Glowing Flame Cone
-        const flameMesh = new THREE.Mesh(flameGeo, flameMat);
-        flameMesh.position.set(p.x, 4.25, p.z);
-        cakeGroup.add(flameMesh);
-        flames3D.push(flameMesh);
-
-        // 3D Point Light at Flame
-        const flameLight = new THREE.PointLight(0xffaa00, 1.8, 6);
-        flameLight.position.set(p.x, 4.3, p.z);
-        cakeGroup.add(flameLight);
-        flameLights3D.push(flameLight);
-    });
-
-    scene3D.add(cakeGroup);
-
-    // Animation Loop
-    function animate3D() {
-        requestAnimationFrame(animate3D);
-
-        if (controls3D) controls3D.update();
-
-        // Candle flame flicker animation
-        if (!isCandleBlown) {
-            const time = Date.now() * 0.008;
-            flames3D.forEach((f, i) => {
-                const s = 1 + Math.sin(time + i * 2) * 0.15;
-                f.scale.set(s, s * 1.1, s);
-                f.rotation.z = Math.sin(time * 1.5 + i) * 0.08;
-            });
-            flameLights3D.forEach((l, i) => {
-                l.intensity = 1.6 + Math.sin(time * 2 + i) * 0.4;
-            });
-        }
-
-        renderer3D.render(scene3D, camera3D);
-    }
-
-    animate3D();
-
-    // Handle Window Resize for 3D Canvas
-    window.addEventListener('resize', () => {
-        if (!holder || !renderer3D || !camera3D) return;
-        const w = holder.clientWidth || 400;
-        const h = holder.clientHeight || 280;
-        camera3D.aspect = w / h;
-        camera3D.updateProjectionMatrix();
-        renderer3D.setSize(w, h);
-    });
 }
 
 // ==================== 4. CANDLE BLOWING & WEB AUDIO API ====================
@@ -464,19 +264,22 @@ function triggerBlowSuccess() {
     if (isCandleBlown) return;
     isCandleBlown = true;
 
+    const flames = document.querySelectorAll('.flame-2d');
+    const smokes = document.querySelectorAll('.smoke-2d');
     const roomOverlay = document.getElementById('room-dim-overlay');
+    const cakeAura = document.getElementById('cake-aura');
 
-    // 1. 3D Flames extinguish animation
-    flames3D.forEach(f => {
-        gsap.to(f.scale, { x: 0, y: 0, z: 0, duration: 0.3 });
-    });
-    flameLights3D.forEach(l => {
-        gsap.to(l, { intensity: 0, duration: 0.3 });
-    });
+    // 1. Flames flicker wildly from blowing wind
+    flames.forEach(flame => flame.classList.add('flicker-out'));
 
     // 2. Dramatic momentary Blackout Flash (dập nến vụt tắt!)
     setTimeout(() => {
         if (roomOverlay) roomOverlay.classList.add('blackout');
+
+        // Extinguish flames & glowing aura
+        flames.forEach(flame => flame.classList.add('extinguished'));
+        if (cakeAura) cakeAura.classList.add('extinguished');
+        smokes.forEach(smoke => smoke.classList.add('active'));
 
         // 3. Room lights turn back on, fireworks explosion & music starts!
         setTimeout(() => {
