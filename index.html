@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday! ✨🌸</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- GSAP for smooth animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Room Ambient Light Dimming Overlay for Candle Blowing Moment -->
+    <div id="room-dim-overlay" class="room-overlay"></div>
+
+    <!-- Dynamic Background Particle Elements -->
+    <div id="ambient-bg">
+        <div class="pastel-blob blob-1"></div>
+        <div class="pastel-blob blob-2"></div>
+        <div class="pastel-blob blob-3"></div>
+        <div id="floating-elements-container"></div>
+    </div>
+
+    <!-- ==================== SECTION 1: UNLOCK QUIZ ==================== -->
+    <section id="unlock-section" class="active-section">
+        <div class="glass-card quiz-card">
+            <div class="gift-icon-wrapper">
+                <i class="fa-solid fa-gift gift-bounce"></i>
+            </div>
+            <h2 class="section-title">Mở Hộp Quà Sinh Nhật ✨</h2>
+            <p id="quiz-question" class="quiz-question-text">Đang tải câu hỏi...</p>
+            
+            <div class="input-group">
+                <input type="text" id="quiz-answer" placeholder="Nhập câu trả lời của ng đẹp..." autocomplete="off">
+                <button id="btn-submit-quiz" class="btn-pastel">
+                    Mở Quà <i class="fa-solid fa-key"></i>
+                </button>
+            </div>
+            
+            <button id="btn-hint" class="btn-link"><i class="fa-regular fa-lightbulb"></i> Xem gợi ý</button>
+            <p id="hint-text" class="hint-box hidden"></p>
+            <p id="quiz-error" class="error-msg hidden"><i class="fa-solid fa-face-flushed"></i> Sai rùi ng đẹp ơi, đoán lại điiiiiiiii 🙈✨</p>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 2: CANDLE BLOWING & 2-TIER CAKE ==================== -->
+    <section id="cake-section" class="hidden-section">
+        <div class="glass-card cake-card center-content">
+            <div class="pastel-badge">Ước một điều ước nào ng đẹp ơi! ✨</div>
+            <h1 class="celebration-heading">Chúc Mừng Sinh Nhật <span id="recipient-name-cake"></span>! 🌸</h1>
+            
+            <!-- 2-Tier Pastel Birthday Cake -->
+            <div class="cake-container">
+                <div class="cake-glow-aura" id="cake-aura"></div>
+                <div class="cake-2tier">
+                    <div class="plate-2tier"></div>
+                    <!-- Bottom Tier -->
+                    <div class="tier tier-bottom">
+                        <div class="icing-drips drips-bottom">
+                            <div class="drip"></div><div class="drip"></div><div class="drip"></div><div class="drip"></div><div class="drip"></div>
+                        </div>
+                    </div>
+                    <!-- Top Tier -->
+                    <div class="tier tier-top">
+                        <div class="icing-drips drips-top">
+                            <div class="drip"></div><div class="drip"></div><div class="drip"></div><div class="drip"></div>
+                        </div>
+                        <!-- Cream Cherries on Top -->
+                        <div class="top-decorations">
+                            <span class="cream-piping"></span>
+                            <span class="cream-piping"></span>
+                            <span class="cream-piping"></span>
+                        </div>
+                    </div>
+                    <!-- Swaying & Flickering Candles -->
+                    <div class="candles-wrapper-2tier">
+                        <div class="candle candle-sway-1">
+                            <div class="wick"></div>
+                            <div class="flame flame-glow" id="flame-1"></div>
+                            <div class="smoke" id="smoke-1"></div>
+                        </div>
+                        <div class="candle candle-sway-2">
+                            <div class="wick"></div>
+                            <div class="flame flame-glow" id="flame-2"></div>
+                            <div class="smoke" id="smoke-2"></div>
+                        </div>
+                        <div class="candle candle-sway-3">
+                            <div class="wick"></div>
+                            <div class="flame flame-glow" id="flame-3"></div>
+                            <div class="smoke" id="smoke-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candle Controls -->
+            <div class="mic-control-box">
+                <p class="instruction-text">
+                    <i class="fa-solid fa-microphone-lines"></i> Nối Micro thoại và <b>THỔI MẠNH</b> vào mic để thổi tắt nến nhé!
+                </p>
+                <div class="mic-status-bar">
+                    <div id="mic-level" class="mic-level-fill"></div>
+                </div>
+                <div class="btn-group">
+                    <button id="btn-start-mic" class="btn-pastel btn-secondary">
+                        <i class="fa-solid fa-microphone"></i> Bật Mic Thổi Nến
+                    </button>
+                    <button id="btn-manual-blow" class="btn-pastel">
+                        <i class="fa-solid fa-wind"></i> Thổi Nến Bằng Tay (Click)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 3: MAIN FESTIVAL PLAYGROUND ==================== -->
+    <section id="playground-section" class="hidden-section">
+        <!-- Floating Header Bar -->
+        <header class="top-nav">
+            <div class="logo-pastel">
+                <i class="fa-solid fa-cake-candles"></i> Happy Birthday <span id="nav-recipient-name"></span>
+            </div>
+            <!-- Music Player Controller -->
+            <div class="music-player-widget">
+                <button id="btn-music-toggle" class="btn-music">
+                    <i class="fa-solid fa-compact-disc fa-spin spinner-music" id="music-disc-icon"></i>
+                    <span id="music-status-text">Đang phát nhạc</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="playground-container">
+            
+            <!-- Hero Welcome Card -->
+            <div class="glass-card hero-welcome">
+                <h2>🎉 Tuổi Mới Vui Vẻ & Rạng Rỡ 🌸</h2>
+                <p>Kéo xuống dưới để xem góc kỷ niệm & cào chiếc thiệp chúc mừng bí mật dành riêng cho ng đẹp!</p>
+            </div>
+
+            <!-- 1. Polaroid Photo Gallery Wall -->
+            <div class="gallery-section">
+                <h3 class="section-subtitle"><i class="fa-solid fa-camera-retro"></i> Góc Kỷ Niệm 📸</h3>
+                <div id="polaroid-grid" class="polaroid-grid">
+                    <!-- Dynamic Polaroid Cards or Empty Message rendered from JS -->
+                </div>
+            </div>
+
+            <!-- 2. Interactive Scratch Card (Thiệp cào) -->
+            <div class="scratch-card-section">
+                <h3 class="section-subtitle"><i class="fa-solid fa-wand-magic-sparkles"></i> Bức Thư Bí Mật 💌</h3>
+                <p class="sub-hint">Dùng chuột hoặc ngón tay cào lớp phủ ánh kim bên dưới để đọc thư nè!</p>
+                
+                <div class="scratch-card-wrapper">
+                    <!-- Underneath Content (Secret Letter) -->
+                    <div class="secret-letter-content">
+                        <div class="letter-header">
+                            <i class="fa-solid fa-envelope-open-text"></i> Gửi ng đẹp!
+                        </div>
+                        <pre id="secret-letter-text" class="letter-body"></pre>
+                        <div class="letter-footer">
+                            <i class="fa-solid fa-star gold-star"></i> Chúc mừng sinh nhật ng đẹp!
+                        </div>
+                    </div>
+                    <!-- Canvas Layer overlay to scratch -->
+                    <canvas id="scratch-canvas" width="600" height="350"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <footer class="footer-pastel">
+            <p>Made with ✨ for <span id="footer-recipient"></span> | Happy Birthday 2026 🌸</p>
+        </footer>
+    </section>
+
+    <!-- Modal image preview -->
+    <div id="photo-modal" class="modal hidden-modal">
+        <div class="modal-content glass-card">
+            <span id="close-modal" class="close-btn">&times;</span>
+            <img id="modal-img" src="" alt="Photo Preview">
+            <p id="modal-caption" class="modal-caption"></p>
+        </div>
+    </div>
+
+    <!-- Background Audio Element -->
+    <audio id="bg-music" loop preload="auto"></audio>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
