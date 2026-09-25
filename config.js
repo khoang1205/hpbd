@@ -22,16 +22,11 @@ Chúc ng đẹp luôn mỉm cười thật tươi, luôn tràn đầy năng lư�
 
 Một lần nữa, chúc ng đẹp luôn luôn vui cười, thích cái gì sẽ được cái đó. hạp pi pớt đayyyy 🌸🎂🎈`,
 
-    // Lời nhắn cho tường kỷ niệm
-    emptyPhotoMessage: "Khoảnh khắc tuyệt vời của ng đẹp 🌸✨",
+    // Lời nhắn cho tường kỷ niệm khi chưa có ảnh
+    emptyPhotoMessage: "Vì toi không có ảnh nào của ng đẹp nên để ở đây tượng trưng, sau này có thì sẽ bổ sung sau ✨",
 
-    // Danh sách ảnh kỷ niệm (Vẽ bằng Text Art từ chữ 'Thanh')
-    photos: [
-        {
-            caption: "ng đẹp ✨",
-            isTextArt: true
-        }
-    ],
+    // Danh sách ảnh kỷ niệm (Để trống để hiện khung tượng trưng như ban đầu)
+    photos: [],
 
     // Nhạc nền (Audio chúc mừng sinh nhật)
     musicUrl: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=happy-birthday-155461.mp3",
