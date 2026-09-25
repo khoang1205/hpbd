@@ -607,12 +607,12 @@ function initTextArt() {
 
     const WORD = 'Thanh';
 
-    // Collect all dark pixels
+    // Collect subject pixels only (background baked as 255 = skip)
     const positions = [];
     for (let sy = 0; sy < GRID_H; sy++) {
         for (let sx = 0; sx < GRID_W; sx++) {
             const b = getBrightness(sx, sy);
-            if (b < 0.58) positions.push({ sx, sy, b });
+            if (b < 0.90) positions.push({ sx, sy, b }); // 0.90 = background cutoff (255/255 ≈ 1.0)
         }
     }
 
@@ -626,7 +626,7 @@ function initTextArt() {
 
     positions.forEach(({ sx, sy, b }) => {
         const darkness = 1 - b;
-        if (darkness < 0.32) return; // skip near-white
+        if (darkness < 0.12) return; // only skip near-255 background leftovers
 
         // De-duplicate by cell to avoid overcrowding
         const key = `${Math.floor(sx/2)}_${Math.floor(sy/2)}`;
