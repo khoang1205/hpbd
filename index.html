@@ -211,10 +211,21 @@
         </footer>
     </section>
 
-    <!-- Modal image preview -->
+    <!-- Modal image/text art preview -->
     <div id="photo-modal" class="modal hidden-modal">
         <div class="modal-content glass-card">
             <span id="close-modal" class="close-btn">&times;</span>
+            <div id="modal-text-art-box" class="hidden text-art-box">
+                <div class="text-art-header">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                    <span class="file-title">thanh_portrait.txt</span>
+                </div>
+                <div class="text-art-content-wrapper">
+                    <pre id="modal-text-art" class="text-art-pre"></pre>
+                </div>
+            </div>
             <img id="modal-img" src="" alt="Photo Preview">
             <p id="modal-caption" class="modal-caption"></p>
         </div>
@@ -223,6 +234,7 @@
     <!-- Background Audio Element -->
     <audio id="bg-music" loop preload="auto"></audio>
 
+    <script src="assets/thanh_art.js"></script>
     <script src="config.js"></script>
     <script src="script.js"></script>
 </body>

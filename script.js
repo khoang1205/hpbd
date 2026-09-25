@@ -366,25 +366,53 @@ function initPolaroidGallery() {
         const card = document.createElement('div');
         card.className = 'polaroid-card';
         
-        // Random slight rotation between -6deg and 6deg
-        const rotation = (Math.random() * 12 - 6).toFixed(1);
+        // Random slight rotation between -4deg and 4deg
+        const rotation = (Math.random() * 8 - 4).toFixed(1);
         card.style.setProperty('--rotation', rotation);
 
-        card.innerHTML = `
-            <div class="polaroid-tape"></div>
-            <div class="polaroid-img-box">
-                <img src="${photo.url}" alt="Memory ${idx + 1}" loading="lazy">
-            </div>
-            <div class="polaroid-caption">${photo.caption}</div>
-        `;
+        if (photo.isTextArt || !photo.url) {
+            const artText = window.THANH_TEXT_ART || "Thanh Thanh Thanh...";
+            card.innerHTML = `
+                <div class="polaroid-tape"></div>
+                <div class="polaroid-img-box text-art-img-box">
+                    <pre class="polaroid-text-art">${artText}</pre>
+                </div>
+                <div class="polaroid-caption">${photo.caption || "ng đẹp ✨"}</div>
+            `;
 
-        card.addEventListener('click', () => {
-            if (modal && modalImg && modalCaption) {
-                modalImg.src = photo.url;
-                modalCaption.textContent = photo.caption;
-                modal.classList.remove('hidden-modal');
-            }
-        });
+            card.addEventListener('click', () => {
+                const modalTextArtBox = document.getElementById('modal-text-art-box');
+                const modalTextArt = document.getElementById('modal-text-art');
+                if (modal && modalCaption) {
+                    if (modalImg) modalImg.classList.add('hidden');
+                    if (modalTextArtBox && modalTextArt) {
+                        modalTextArt.textContent = artText;
+                        modalTextArtBox.classList.remove('hidden');
+                    }
+                    modalCaption.textContent = photo.caption || "ng đẹp ✨";
+                    modal.classList.remove('hidden-modal');
+                }
+            });
+        } else {
+            card.innerHTML = `
+                <div class="polaroid-tape"></div>
+                <div class="polaroid-img-box">
+                    <img src="${photo.url}" alt="Memory ${idx + 1}" loading="lazy">
+                </div>
+                <div class="polaroid-caption">${photo.caption}</div>
+            `;
+
+            card.addEventListener('click', () => {
+                const modalTextArtBox = document.getElementById('modal-text-art-box');
+                if (modal && modalImg && modalCaption) {
+                    if (modalTextArtBox) modalTextArtBox.classList.add('hidden');
+                    modalImg.classList.remove('hidden');
+                    modalImg.src = photo.url;
+                    modalCaption.textContent = photo.caption;
+                    modal.classList.remove('hidden-modal');
+                }
+            });
+        }
 
         grid.appendChild(card);
     });
@@ -546,52 +574,7 @@ function initTextArt() {
     const displayEl = document.getElementById('text-art-display');
     if (!displayEl) return;
 
-    const img = new Image();
-    img.crossOrigin = "Anonymous";
-    img.src = "assets/thanh.png";
-
-    img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Character resolution width
-        const widthChars = 92;
-        const aspectRatio = img.height / img.width;
-        const heightChars = Math.round(widthChars * aspectRatio * 0.48);
-
-        canvas.width = widthChars;
-        canvas.height = heightChars;
-
-        ctx.drawImage(img, 0, 0, widthChars, heightChars);
-        const imgData = ctx.getImageData(0, 0, widthChars, heightChars);
-        const pixels = imgData.data;
-
-        const word = "Thanh ";
-        let wordIdx = 0;
-        let resultArt = "";
-
-        for (let y = 0; y < heightChars; y++) {
-            for (let x = 0; x < widthChars; x++) {
-                const pIdx = (y * widthChars + x) * 4;
-                const r = pixels[pIdx];
-                const g = pixels[pIdx + 1];
-                const b = pixels[pIdx + 2];
-                const alpha = pixels[pIdx + 3];
-
-                // Brightness calculation
-                const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-                if (alpha < 50 || brightness > 0.84) {
-                    resultArt += " ";
-                } else {
-                    const char = word[wordIdx % word.length];
-                    wordIdx++;
-                    resultArt += char;
-                }
-            }
-            resultArt += "\n";
-        }
-
-        displayEl.textContent = resultArt;
-    };
+    if (window.THANH_TEXT_ART) {
+        displayEl.textContent = window.THANH_TEXT_ART;
+    }
 }

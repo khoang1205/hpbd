@@ -25,11 +25,11 @@ Một lần nữa, chúc ng đẹp luôn luôn vui cười, thích cái gì sẽ
     // Lời nhắn cho tường kỷ niệm
     emptyPhotoMessage: "Khoảnh khắc tuyệt vời của ng đẹp 🌸✨",
 
-    // Danh sách ảnh kỷ niệm
+    // Danh sách ảnh kỷ niệm (Vẽ bằng Text Art từ chữ 'Thanh')
     photos: [
         {
-            url: "assets/thanh.png",
-            caption: "ng đẹp ✨"
+            caption: "ng đẹp ✨",
+            isTextArt: true
         }
     ],
 
