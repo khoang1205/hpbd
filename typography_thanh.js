@@ -29,10 +29,9 @@ function cinfo(x,y){
 }
 function isPerson(x,y){
   const c=cinfo(x,y);const xr=x/IW,yr=y/IH;const rb=c.r-c.b;
-  if(yr < 0.48) return false;
-  if(c.l < 92 && xr>0.20 && xr<0.82) return true;
-  if(c.h>=8 && c.h<=42 && c.l>=115 && c.l<=164 && c.s>=0.45 && rb>=95 && c.r>=c.g && c.g>=c.b){ if(xr>0.18 && xr<0.84) return true; }
-  if(c.h>=6 && c.h<=45 && c.l>=110 && c.l<=168 && c.s>=0.14 && c.s<=0.42 && rb>=28 && rb<=95 && c.r>=c.g && c.g>=c.b){ if(xr>0.24 && xr<0.78) return true; }
+  if(c.l < 92 && xr>0.20 && xr<0.82 && yr>0.12) return true;
+  if(c.h>=8 && c.h<=42 && c.l>=115 && c.l<=164 && c.s>=0.45 && rb>=95 && c.r>=c.g && c.g>=c.b){ if(xr>0.18 && xr<0.84 && yr>0.12) return true; }
+  if(c.h>=6 && c.h<=45 && c.l>=110 && c.l<=168 && c.s>=0.14 && c.s<=0.42 && rb>=28 && rb<=95 && c.r>=c.g && c.g>=c.b){ if(xr>0.24 && xr<0.78 && yr>0.40) return true; }
   return false;
 }
 const raw=new Uint8Array(IW*IH);
@@ -62,101 +61,95 @@ maxY=Math.min(rawMaxY, Math.round(minY + (rawMaxY-minY)*ZOOM));
 const pad=Math.round((maxY-minY)*0.01);
 minX=Math.max(0,minX-pad);maxX=Math.min(IW-1,maxX+pad);minY=Math.max(0,minY-pad);maxY=Math.min(IH-1,maxY+pad);
 
-// ── grid: Balanced resolution for clear, larger readable Thanh words ─────────────────────────
-const GW = parseInt(process.argv[4] || '70');
-const GH = Math.round(GW * (maxY - minY) / (maxX - minX));
-const maskG = new Uint8Array(GW * GH);
-const lumG = new Float32Array(GW * GH);
-const edgeG = new Float32Array(GW * GH);
-const colG = new Float32Array(GW * GH * 3);
+// ── grid: 170 columns to preserve EXACT eye & hair tuck details ─────────
+const GW=170;
+const GH=Math.round(GW*(maxY-minY)/(maxX-minX));
+const maskG=new Uint8Array(GW*GH);
+const lumG=new Float32Array(GW*GH);
+const edgeG=new Float32Array(GW*GH);
+const colG=new Float32Array(GW*GH*3);
 
-for (let gy = 0; gy < GH; gy++) for (let gx = 0; gx < GW; gx++) {
-  const x0 = minX + Math.floor((gx / GW) * (maxX - minX));
-  const x1 = minX + Math.floor(((gx + 1) / GW) * (maxX - minX));
-  const y0 = minY + Math.floor((gy / GH) * (maxY - minY));
-  const y1 = minY + Math.floor(((gy + 1) / GH) * (maxY - minY));
-  let mcnt = 0, n = 0, lsum = 0, esum = 0, rs = 0, gs = 0, bs = 0;
-  for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
-    if (x < 0 || y < 0 || x >= IW || y >= IH) continue;
-    const i = y * IW + x; n++;
-    if (mask[i]) mcnt++;
-    lsum += lum[i]; esum += sobel(x, y);
-    rs += img.data[i * 4]; gs += img.data[i * 4 + 1]; bs += img.data[i * 4 + 2];
+for(let gy=0;gy<GH;gy++)for(let gx=0;gx<GW;gx++){
+  const x0=minX+Math.floor((gx/GW)*(maxX-minX));
+  const x1=minX+Math.floor(((gx+1)/GW)*(maxX-minX));
+  const y0=minY+Math.floor((gy/GH)*(maxY-minY));
+  const y1=minY+Math.floor(((gy+1)/GH)*(maxY-minY));
+  let mcnt=0,n=0,lsum=0,esum=0,rs=0,gs=0,bs=0;
+  for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){
+    if(x<0||y<0||x>=IW||y>=IH) continue;
+    const i=y*IW+x;n++;
+    if(mask[i])mcnt++;
+    lsum+=lum[i];esum+=sobel(x,y);
+    rs+=img.data[i*4];gs+=img.data[i*4+1];bs+=img.data[i*4+2];
   }
-  const ci = gy * GW + gx;
-  if (n === 0) {
-    maskG[ci] = 0; lumG[ci] = 0; edgeG[ci] = 0;
-    colG[ci * 3] = 0; colG[ci * 3 + 1] = 0; colG[ci * 3 + 2] = 0;
-    continue;
-  }
-  maskG[ci] = (mcnt / n > 0.45) ? 1 : 0;
-  lumG[ci] = lsum / n / 255;
-  edgeG[ci] = esum / n / 255;
-  colG[ci * 3] = rs / n; colG[ci * 3 + 1] = gs / n; colG[ci * 3 + 2] = bs / n;
+  const ci=gy*GW+gx;
+  if(n===0){maskG[ci]=0;lumG[ci]=0;edgeG[ci]=0;colG[ci*3]=0;colG[ci*3+1]=0;colG[ci*3+2]=0;continue;}
+  maskG[ci]=(mcnt/n>0.5)?1:0;
+  lumG[ci]=lsum/n/255;
+  edgeG[ci]=esum/n/255;
+  colG[ci*3]=rs/n;colG[ci*3+1]=gs/n;colG[ci*3+2]=bs/n;
 }
 
-// ── render Ultra-HD Canvas ────────────────────────────────────────────
-const CW = parseInt(process.argv[5] || '2400');
-const CH = Math.round(CW * (GH / GW));
-const canvas = createCanvas(CW, CH);
-const ctx = canvas.getContext('2d');
-ctx.fillStyle = '#0a0a18';
-ctx.fillRect(0, 0, CW, CH);
+// ── render Ultra-HD Canvas (3400px) ──────────────────────────────────
+const CW=3400;
+const CH=Math.round(CW*(GH/GW));
+const canvas=createCanvas(CW,CH);
+const ctx=canvas.getContext('2d');
+ctx.fillStyle='#0b0b18';
+ctx.fillRect(0,0,CW,CH);
 
-const WORD = process.argv[2] || 'Thanh';
-const cellW = CW / GW, cellH = CH / GH;
+const WORD=process.argv[2]||'Thanh';
+const cellW=CW/GW, cellH=CH/GH;
 
-// Base font size scaled for clear readability
-const baseFont = Math.min(cellW * 0.94 / (WORD.length * 0.52), cellH * 0.82);
-console.log(`Rendering: Canvas ${CW}x${CH}, Grid ${GW}x${GH}, BaseFont ${baseFont.toFixed(1)}px, Cell ${cellW.toFixed(1)}x${cellH.toFixed(1)}px`);
+// Base font size scaled cleanly for the Ultra-HD canvas
+const baseFont=Math.min(cellW*0.96/(WORD.length*0.50), cellH*0.72);
+console.log(`Canvas: ${CW}x${CH}, Grid: ${GW}x${GH}, BaseFont: ${baseFont.toFixed(1)}px, Cell: ${cellW.toFixed(1)}x${cellH.toFixed(1)}px`);
 
-for (let gy = 0; gy < GH; gy++) for (let gx = 0; gx < GW; gx++) {
-  if (!maskG[gy * GW + gx]) continue;
-  const b = lumG[gy * GW + gx];
-  const e = edgeG[gy * GW + gx];
-  const darkness = 1 - b;
-  const ink = Math.min(1, darkness * 0.85 + e * 1.5);
+for(let gy=0;gy<GH;gy++)for(let gx=0;gx<GW;gx++){
+  if(!maskG[gy*GW+gx]) continue;
+  const b=lumG[gy*GW+gx];
+  const e=edgeG[gy*GW+gx];
+  // combined ink strength: darkness + edges (edges reveal facial features)
+  const darkness=1-b;
+  const ink=Math.min(1, darkness*0.85 + e*1.6);
+  let fontSize,alpha;
+  if(ink>0.80){fontSize=baseFont*1.08;alpha=1.0;}
+  else if(ink>0.62){fontSize=baseFont*0.96;alpha=0.94;}
+  else if(ink>0.45){fontSize=baseFont*0.85;alpha=0.76;}
+  else if(ink>0.28){fontSize=baseFont*0.72;alpha=0.55;}
+  else if(ink>0.14){fontSize=baseFont*0.62;alpha=0.35;}
+  else{fontSize=baseFont*0.54;alpha=0.20;}
 
-  let fontSize, alpha;
-  if (ink > 0.80) { fontSize = baseFont * 1.08; alpha = 1.0; }
-  else if (ink > 0.60) { fontSize = baseFont * 0.96; alpha = 0.94; }
-  else if (ink > 0.42) { fontSize = baseFont * 0.86; alpha = 0.80; }
-  else if (ink > 0.25) { fontSize = baseFont * 0.74; alpha = 0.60; }
-  else if (ink > 0.12) { fontSize = baseFont * 0.64; alpha = 0.40; }
-  else { fontSize = baseFont * 0.56; alpha = 0.22; }
-
-  const angle = (Math.random() - 0.5) * 0.15;
+  const angle=(Math.random()-0.5)*0.20;
+  // original color, brightened so text stays visible on dark bg
+  let cr=colG[(gy*GW+gx)*3], cg=colG[(gy*GW+gx)*3+1], cb=colG[(gy*GW+gx)*3+2];
+  const clum=(0.299*cr+0.587*cg+0.114*cb)/255;
+  // brighten darker colors; lighten slightly for readability
+  let f=1.0;
+  if(clum<0.35) f=1.55;
+  else if(clum<0.55) f=1.25;
+  else if(clum<0.75) f=1.05;
+  else f=0.95;
+  cr=Math.min(255,cr*f);cg=Math.min(255,cg*f);cb=Math.min(255,cb*f);
   
-  // Original color with readability boost
-  let cr = colG[(gy * GW + gx) * 3], cg = colG[(gy * GW + gx) * 3 + 1], cb = colG[(gy * GW + gx) * 3 + 2];
-  const clum = (0.299 * cr + 0.587 * cg + 0.114 * cb) / 255;
-  
-  let f = 1.0;
-  if (clum < 0.30) f = 1.60;
-  else if (clum < 0.50) f = 1.30;
-  else if (clum < 0.70) f = 1.10;
-  else f = 0.98;
-
-  cr = Math.min(255, cr * f); cg = Math.min(255, cg * f); cb = Math.min(255, cb * f);
-
   ctx.save();
-  ctx.globalAlpha = alpha;
-  ctx.font = `bold ${Math.round(fontSize)}px "Segoe UI", Arial, sans-serif`;
-  ctx.fillStyle = `rgb(${Math.round(cr)},${Math.round(cg)},${Math.round(cb)})`;
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.translate((gx + 0.5) * cellW, (gy + 0.5) * cellH);
+  ctx.globalAlpha=alpha;
+  ctx.font=`bold ${Math.round(fontSize)}px "Segoe UI", Arial, sans-serif`;
+  ctx.fillStyle=`rgb(${Math.round(cr)},${Math.round(cg)},${Math.round(cb)})`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.translate((gx+0.5)*cellW,(gy+0.5)*cellH);
   ctx.rotate(angle);
-  ctx.fillText(WORD, 0, 0);
+  ctx.fillText(WORD,0,0);
   ctx.restore();
 }
 
-// Soft radial vignette
-const v = ctx.createRadialGradient(CW / 2, CH / 2, CH * 0.22, CW / 2, CH / 2, CH * 0.72);
-v.addColorStop(0, 'rgba(0,0,0,0)');
-v.addColorStop(1, 'rgba(10,10,24,0.45)');
-ctx.fillStyle = v; ctx.fillRect(0, 0, CW, CH);
+// soft vignette
+const v=ctx.createRadialGradient(CW/2,CH/2,CH*0.2,CW/2,CH/2,CH*0.72);
+v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(11,11,24,0.45)');
+ctx.fillStyle=v;ctx.fillRect(0,0,CW,CH);
 
 fs.writeFileSync('assets/typography_thanh_color.png', canvas.toBuffer('image/png'));
 fs.writeFileSync('typography_thanh_color.png', canvas.toBuffer('image/png'));
-console.log(`✅ Saved typography_thanh_color.png (${CW}x${CH}) word="${WORD}" grid=${GW}x${GH}`);
+console.log(`✅ Saved typography_thanh_color.png (${CW}x${CH}) with preserved eyes and hair structure!`);
+
 
