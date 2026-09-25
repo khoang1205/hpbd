@@ -21,7 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6. Setup Scratch Card Canvas
     initScratchCard();
 
-    // 7. Setup Music Controller
+    // 7. Setup Text Art Generator (Made of "Thanh ")
+    initTextArt();
+
+    // 8. Setup Music Controller
     initMusicPlayer();
 });
 
@@ -536,4 +539,59 @@ function playMusic() {
             console.warn("Autoplay prevented:", err);
         });
     }
+}
+
+// ==================== 8. TEXT ART GENERATOR (MADE OF "Thanh ") ====================
+function initTextArt() {
+    const displayEl = document.getElementById('text-art-display');
+    if (!displayEl) return;
+
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.src = "assets/thanh.png";
+
+    img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Character resolution width
+        const widthChars = 92;
+        const aspectRatio = img.height / img.width;
+        const heightChars = Math.round(widthChars * aspectRatio * 0.48);
+
+        canvas.width = widthChars;
+        canvas.height = heightChars;
+
+        ctx.drawImage(img, 0, 0, widthChars, heightChars);
+        const imgData = ctx.getImageData(0, 0, widthChars, heightChars);
+        const pixels = imgData.data;
+
+        const word = "Thanh ";
+        let wordIdx = 0;
+        let resultArt = "";
+
+        for (let y = 0; y < heightChars; y++) {
+            for (let x = 0; x < widthChars; x++) {
+                const pIdx = (y * widthChars + x) * 4;
+                const r = pixels[pIdx];
+                const g = pixels[pIdx + 1];
+                const b = pixels[pIdx + 2];
+                const alpha = pixels[pIdx + 3];
+
+                // Brightness calculation
+                const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+                if (alpha < 50 || brightness > 0.84) {
+                    resultArt += " ";
+                } else {
+                    const char = word[wordIdx % word.length];
+                    wordIdx++;
+                    resultArt += char;
+                }
+            }
+            resultArt += "\n";
+        }
+
+        displayEl.textContent = resultArt;
+    };
 }

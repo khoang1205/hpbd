@@ -921,7 +921,69 @@ section {
     padding: 0 10px;
 }
 
-/* Scratch Card Section */
+/* Text Art Section (Inspired by tunnaduong/chuc-mung-sinh-nhat) */
+.text-art-section {
+    width: 100%;
+}
+
+.text-art-box {
+    background: #1e1e2e;
+    border-radius: 18px;
+    border: 1.5px solid rgba(255, 133, 162, 0.4);
+    overflow: hidden;
+    box-shadow: 0 14px 32px rgba(0,0,0,0.2);
+    margin-top: 10px;
+}
+
+.text-art-header {
+    background: #282a36;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #383a59;
+}
+
+.text-art-header .dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.text-art-header .dot.red { background: #ff5555; }
+.text-art-header .dot.yellow { background: #f1fa8c; }
+.text-art-header .dot.green { background: #50fa7b; }
+
+.file-title {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85rem;
+    color: #bd93f9;
+    margin-left: 10px;
+    font-weight: 500;
+}
+
+.text-art-content-wrapper {
+    padding: 16px;
+    overflow-x: auto;
+    max-height: 480px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #181825;
+}
+
+.text-art-pre {
+    font-family: 'Fira Code', 'Courier New', monospace !important;
+    font-size: 7.5px;
+    line-height: 7.5px;
+    letter-spacing: -0.5px;
+    color: #ff85a2;
+    text-shadow: 0 0 6px rgba(255, 133, 162, 0.6);
+    user-select: text;
+    white-space: pre;
+    margin: 0 auto;
+}
 .scratch-card-section {
     width: 100%;
 }

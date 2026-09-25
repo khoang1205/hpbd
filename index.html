@@ -7,7 +7,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Fira+Code:wght@400;500&family=Plus+Jakarta+Sans:wght@400;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Canvas Confetti Library -->
@@ -154,18 +154,36 @@
             <!-- Hero Welcome Card -->
             <div class="glass-card hero-welcome">
                 <h2>🎉 Tuổi Mới Vui Vẻ & Rạng Rỡ 🌸</h2>
-                <p>Kéo xuống dưới để xem góc kỷ niệm & cào chiếc thiệp chúc mừng bí mật dành riêng cho ng đẹp!</p>
+                <p>Kéo xuống dưới để xem góc kỷ niệm của ng đẹp & cào chiếc thiệp chúc mừng bí mật dành riêng cho ng đẹp!</p>
             </div>
 
             <!-- 1. Polaroid Photo Gallery Wall -->
             <div class="gallery-section">
                 <h3 class="section-subtitle"><i class="fa-solid fa-camera-retro"></i> Góc Kỷ Niệm 📸</h3>
                 <div id="polaroid-grid" class="polaroid-grid">
-                    <!-- Dynamic Polaroid Cards or Empty Message rendered from JS -->
+                    <!-- Dynamic Polaroid Cards rendered from JS -->
                 </div>
             </div>
 
-            <!-- 2. Interactive Scratch Card (Thiệp cào) -->
+            <!-- 2. ASCII Text Art Canvas Section (Made out of the word "Thanh") -->
+            <div class="text-art-section">
+                <h3 class="section-subtitle"><i class="fa-solid fa-terminal"></i> Bức Họa Text Art Ký Tự ✨</h3>
+                <p class="sub-hint">Bức ảnh chân dung của ng đẹp được khắc họa tinh tế bằng các dòng chữ "Thanh" lặp lại!</p>
+                
+                <div class="text-art-box">
+                    <div class="text-art-header">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                        <span class="file-title">thanh_portrait.txt</span>
+                    </div>
+                    <div class="text-art-content-wrapper">
+                        <pre id="text-art-display" class="text-art-pre">Đang tạo bức họa Text Art từ chữ 'Thanh'...</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Interactive Scratch Card (Thiệp cào) -->
             <div class="scratch-card-section">
                 <h3 class="section-subtitle"><i class="fa-solid fa-wand-magic-sparkles"></i> Bức Thư Bí Mật 💌</h3>
                 <p class="sub-hint">Dùng chuột hoặc ngón tay cào lớp phủ ánh kim bên dưới để đọc thư nè!</p>

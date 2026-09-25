@@ -1,5 +1,5 @@
 // ===================================================
-// FILE CẤU HÌNH THÔNG TIN CHÚC MỪNG SINH NHẬT (NG ĐẸP)
+// FILE CẤU HÌNH THÔNG TIN CHÚC MỪNG SINH NHẬT (NGƯỜI ĐẸP)
 // Bạn có thể dễ dàng thay đổi thông tin, lời chúc, bài hát ở đây!
 // ===================================================
 
@@ -22,11 +22,16 @@ Chúc ng đẹp luôn mỉm cười thật tươi, luôn tràn đầy năng lư�
 
 Một lần nữa, chúc ng đẹp luôn luôn vui cười, thích cái gì sẽ được cái đó. hạp pi pớt đayyyy 🌸🎂🎈`,
 
-    // Lời nhắn thay thế cho tường kỷ niệm khi chưa có ảnh
-    emptyPhotoMessage: "Vì toi không có ảnh nào của ng đẹp nên để ở đây tượng trưng, sau này có thì sẽ bổ sung sau ✨",
+    // Lời nhắn cho tường kỷ niệm
+    emptyPhotoMessage: "Khoảnh khắc tuyệt vời của ng đẹp 🌸✨",
 
-    // Danh sách ảnh kỷ niệm (Hiện tại để trống)
-    photos: [],
+    // Danh sách ảnh kỷ niệm
+    photos: [
+        {
+            url: "assets/thanh.png",
+            caption: "ng đẹp ✨"
+        }
+    ],
 
     // Nhạc nền (Audio chúc mừng sinh nhật)
     musicUrl: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=happy-birthday-155461.mp3",
