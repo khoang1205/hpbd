@@ -567,16 +567,9 @@ function playMusic() {
     }
 }
 
-// ==================== 8. TEXT PORTRAIT ART (TYPOGRAPHY PHOTO VIEWER) ====================
+// ==================== 8. TEXT PORTRAIT ART ====================
 function initTextArt() {
-    const wrapper = document.getElementById('text-portrait-wrapper');
-    if (!wrapper) return;
-
-    wrapper.addEventListener('click', () => {
-        if (typeof openPhotoModal === 'function') {
-            openPhotoModal('assets/typography_thanh_color.png', 'Bức họa chân dung tạo từ hàng nghìn chữ "Thanh" 🌸');
-        }
-    });
+    // Text portrait display
 }
 
 // ==================== 9. PHOTO MODAL PREVIEW ====================

@@ -959,13 +959,12 @@ section {
     background: #0d0d1a;
     box-shadow: 0 16px 45px rgba(0, 0, 0, 0.4), 0 0 35px rgba(255, 133, 162, 0.2);
     border: 2px solid rgba(255, 133, 162, 0.4);
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: default;
+    transition: box-shadow 0.3s ease;
 }
 
 .text-portrait-wrapper:hover {
-    transform: translateY(-4px) scale(1.01);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 45px rgba(255, 133, 162, 0.35);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), 0 0 45px rgba(255, 133, 162, 0.3);
 }
 
 #text-portrait-img {
@@ -990,23 +989,18 @@ section {
 }
 
 .zoom-badge {
-    background: rgba(255, 133, 162, 0.9);
+    background: rgba(255, 133, 162, 0.92);
     color: #fff;
     font-size: 0.85rem;
     font-weight: 600;
-    padding: 6px 16px;
+    padding: 7px 18px;
     border-radius: 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    backdrop-filter: blur(4px);
-    transition: transform 0.2s ease, background 0.2s ease;
-}
-
-.text-portrait-wrapper:hover .zoom-badge {
-    transform: scale(1.05);
-    background: #ff6b8b;
+    backdrop-filter: blur(6px);
+    letter-spacing: 0.2px;
 }
 
 
