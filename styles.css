@@ -1832,15 +1832,57 @@ section {
     }
 
     .celebration-heading {
-        font-size: 1.9rem;
-        margin-bottom: 15px;
+        font-size: 1.85rem;
+        margin-bottom: 12px;
     }
 
-    .cake-container {
+    .cake-container-2d {
         transform: scale(0.85);
         transform-origin: bottom center;
+        height: 235px;
+        margin-bottom: 8px;
+    }
+
+    /* Chibi Blowing Popup Modal Mobile */
+    .chibi-modal-content {
+        max-width: 350px;
+        width: 95%;
+        padding: 16px 12px 14px;
+        border-radius: 20px;
+    }
+
+    .chibi-modal-badge {
+        font-size: 0.82rem;
+        padding: 4px 14px;
+        margin-bottom: 4px;
+    }
+
+    .chibi-cake-stage {
+        width: 250px;
+        height: 250px;
+        margin: 4px auto 8px;
+    }
+
+    .chibi-stage-img {
+        width: 230px;
         height: 230px;
-        margin-bottom: 10px;
+    }
+
+    /* Letter Popup Modal Mobile */
+    .letter-popup-content {
+        padding: 24px 16px 16px;
+        max-height: 85vh;
+        width: 95%;
+    }
+
+    .letter-popup-body {
+        max-height: 48vh;
+        padding: 14px;
+    }
+
+    .letter-popup-text {
+        font-size: 0.92rem;
+        line-height: 1.65;
     }
 
     .mic-control-box {
@@ -1948,10 +1990,22 @@ section {
 
 @media (max-width: 380px) {
     .celebration-heading {
-        font-size: 1.6rem;
+        font-size: 1.55rem;
     }
-    .cake-container {
-        transform: scale(0.75);
-        height: 200px;
+    .cake-container-2d {
+        transform: scale(0.72);
+        height: 195px;
+    }
+    .chibi-cake-stage {
+        width: 215px;
+        height: 215px;
+    }
+    .chibi-stage-img {
+        width: 195px;
+        height: 195px;
+    }
+    .chibi-modal-content {
+        max-width: 310px;
+        padding: 14px 10px;
     }
 }

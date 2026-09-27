@@ -336,6 +336,9 @@ function listenMicVolume() {
 function playBlowingWindSound() {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended') {
+            ctx.resume();
+        }
         const bufferSize = ctx.sampleRate * 0.85;
         const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
         const data = buffer.getChannelData(0);
