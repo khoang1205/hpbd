@@ -61,44 +61,58 @@
             <div class="pastel-badge">Ước một điều ước nào ng đẹp ơi! ✨</div>
             <h1 class="celebration-heading">Chúc Mừng Sinh Nhật <span id="recipient-name-cake"></span>! 🌸</h1>
             
-            <!-- Interactive Animated Chibi Blowing Birthday Cake Scene -->
-            <div class="chibi-cake-stage" id="chibi-cake-stage">
-                <!-- Warm Glow behind Candles -->
+            <!-- Kawaii Pastel 2D Cake Illustration -->
+            <div class="cake-container-2d">
                 <div class="cake-glow-aura" id="cake-aura"></div>
-
-                <!-- Frame 1: Chibi with burning candles & puffed cheeks ready to blow -->
-                <div class="chibi-stage-frame frame-burning" id="chibi-frame-burning">
-                    <img src="assets/chibi_burning.png" alt="Chibi Birthday Girl Blowing Cake" class="chibi-stage-img">
-                    <!-- Dynamic flickering flames on top of candles -->
-                    <div class="candle-flame-overlay" id="candle-flame-overlay">
-                        <span class="chibi-flame f-1"></span>
-                        <span class="chibi-flame f-2"></span>
-                        <span class="chibi-flame f-3"></span>
+                
+                <div class="kawaii-cake">
+                    <div class="cake-plate-2d"></div>
+                    
+                    <!-- Bottom Tier -->
+                    <div class="tier-2d bottom-tier">
+                        <div class="scallop-drips">
+                            <span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span>
+                        </div>
+                        <div class="cherry-decorations">
+                            <span class="dot-cherry"></span><span class="dot-cherry"></span><span class="dot-cherry"></span>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Animated Wind Breath Stream -->
-                <div class="blowing-wind-stream" id="blowing-wind-stream">
-                    <div class="wind-swirl ws-1"></div>
-                    <div class="wind-swirl ws-2"></div>
-                    <span class="wind-puff wp-1">💨</span>
-                    <span class="wind-puff wp-2">✨</span>
-                    <span class="wind-puff wp-3">💨</span>
-                    <span class="wind-sparkle">🌟</span>
-                </div>
-
-                <!-- Frame 2: Chibi happy after blowing, candles extinguished with smoke -->
-                <div class="chibi-stage-frame frame-blown" id="chibi-frame-blown">
-                    <img src="assets/chibi_blown.png" alt="Chibi Birthday Girl Happy" class="chibi-stage-img">
-                    <!-- Animated Smoke Curls from Extinguished Wicks -->
-                    <div class="chibi-smoke-container">
-                        <span class="chibi-smoke-curl sm-1"></span>
-                        <span class="chibi-smoke-curl sm-2"></span>
-                        <span class="chibi-smoke-curl sm-3"></span>
+                    <!-- Top Tier -->
+                    <div class="tier-2d top-tier">
+                        <div class="scallop-drips">
+                            <span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span>
+                        </div>
+                        <!-- Strawberry Toppings on Top Tier -->
+                        <div class="strawberry-toppings">
+                            <span class="strawberry-item">🍓</span>
+                            <span class="strawberry-item">🍓</span>
+                            <span class="strawberry-item">🍓</span>
+                        </div>
                     </div>
-                    <!-- Celebration Hearts Burst -->
-                    <div class="celebration-hearts-burst">
-                        <span>💖</span><span>🌸</span><span>✨</span><span>🌟</span>
+
+                    <!-- 3 Candles securely placed on Top Tier -->
+                    <div class="candles-container-2d">
+                        <div class="candle-2d c-left">
+                            <div class="wick-2d"></div>
+                            <div class="flame-2d" id="flame-1"></div>
+                            <div class="smoke-2d" id="smoke-1"></div>
+                        </div>
+                        <div class="candle-2d c-center">
+                            <div class="wick-2d"></div>
+                            <div class="flame-2d" id="flame-2"></div>
+                            <div class="smoke-2d" id="smoke-2"></div>
+                        </div>
+                        <div class="candle-2d c-right">
+                            <div class="wick-2d"></div>
+                            <div class="flame-2d" id="flame-3"></div>
+                            <div class="smoke-2d" id="smoke-3"></div>
+                        </div>
+                    </div>
+
+                    <!-- Cake Banner Badge -->
+                    <div class="cake-banner-2d">
+                        ✨ 09/10 ✨
                     </div>
                 </div>
             </div>
@@ -201,6 +215,54 @@
             <p>Made with ✨ for <span id="footer-recipient"></span> | Happy Birthday 2026 🌸</p>
         </footer>
     </section>
+
+    <!-- Chibi Blowing Animation Popup Modal -->
+    <div id="chibi-blowing-modal" class="modal hidden-modal">
+        <div class="modal-backdrop-overlay" id="chibi-modal-backdrop"></div>
+        <div class="modal-content chibi-modal-content glass-card">
+            <div class="chibi-modal-badge">✨ Bé Chibi Thổi Nến Cùng Ng Đẹp ✨</div>
+            <div class="chibi-cake-stage" id="chibi-cake-stage">
+                <!-- Warm Glow behind Candles -->
+                <div class="cake-glow-aura" id="chibi-cake-aura"></div>
+
+                <!-- Frame 1: Chibi with burning candles & puffed cheeks ready to blow -->
+                <div class="chibi-stage-frame frame-burning" id="chibi-frame-burning">
+                    <img src="assets/chibi_burning.png" alt="Chibi Birthday Girl Blowing Cake" class="chibi-stage-img">
+                    <!-- Dynamic flickering flames on top of candles -->
+                    <div class="candle-flame-overlay" id="candle-flame-overlay">
+                        <span class="chibi-flame f-1"></span>
+                        <span class="chibi-flame f-2"></span>
+                        <span class="chibi-flame f-3"></span>
+                    </div>
+                </div>
+
+                <!-- Animated Wind Breath Stream -->
+                <div class="blowing-wind-stream" id="blowing-wind-stream">
+                    <div class="wind-swirl ws-1"></div>
+                    <div class="wind-swirl ws-2"></div>
+                    <span class="wind-puff wp-1">💨</span>
+                    <span class="wind-puff wp-2">✨</span>
+                    <span class="wind-puff wp-3">💨</span>
+                    <span class="wind-sparkle">🌟</span>
+                </div>
+
+                <!-- Frame 2: Chibi happy after blowing, candles extinguished with smoke -->
+                <div class="chibi-stage-frame frame-blown" id="chibi-frame-blown">
+                    <img src="assets/chibi_blown.png" alt="Chibi Birthday Girl Happy" class="chibi-stage-img">
+                    <!-- Animated Smoke Curls from Extinguished Wicks -->
+                    <div class="chibi-smoke-container">
+                        <span class="chibi-smoke-curl sm-1"></span>
+                        <span class="chibi-smoke-curl sm-2"></span>
+                        <span class="chibi-smoke-curl sm-3"></span>
+                    </div>
+                    <!-- Celebration Hearts Burst -->
+                    <div class="celebration-hearts-burst">
+                        <span>💖</span><span>🌸</span><span>✨</span><span>🌟</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal image/text art preview -->
     <div id="photo-modal" class="modal hidden-modal">
