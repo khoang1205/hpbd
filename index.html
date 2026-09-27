@@ -194,11 +194,21 @@
             <!-- 3. Interactive Scratch Card (Thiệp cào) -->
             <div class="scratch-card-section">
                 <h3 class="section-subtitle"><i class="fa-solid fa-wand-magic-sparkles"></i> Bức Thư Bí Mật 💌</h3>
-                <p class="sub-hint">Dùng chuột hoặc ngón tay cào lớp phủ ánh kim bên dưới để đọc thư nè!</p>
+                <p class="sub-hint" id="scratch-sub-hint">Dùng chuột hoặc ngón tay cào lớp phủ ánh kim bên dưới để đọc thư nè!</p>
                 
-                <div class="scratch-card-wrapper">
-                    <!-- Underneath Content (Secret Letter) -->
-                    <div class="secret-letter-content">
+                <div class="scratch-card-wrapper" id="scratch-card-wrapper">
+                    <!-- Underneath Teaser while scratching (letter text is NOT revealed yet) -->
+                    <div class="scratch-placeholder" id="scratch-placeholder">
+                        <div class="scratch-placeholder-inner">
+                            <div class="scratch-envelope-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
+                            <h4>Đang giải mã bức thư bí mật... 💌</h4>
+                            <p>Cào tiếp lớp ánh kim để mở khóa thư của ng đẹp nhé! ✨</p>
+                            <div class="scratch-sparkles-row"><span>💖</span><span>🌸</span><span>✨</span><span>🌟</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Underneath Content (Secret Letter): Initially hidden, revealed only AFTER popup is closed -->
+                    <div class="secret-letter-content letter-hidden" id="secret-letter-wrapper">
                         <div class="letter-header">
                             <i class="fa-solid fa-envelope-open-text"></i> Gửi ng đẹp!
                         </div>

@@ -466,7 +466,7 @@ function triggerBlowSuccess() {
                 if (windStream) windStream.classList.remove('active');
                 if (frameBurning) frameBurning.classList.add('fade-out');
                 if (frameBlown) frameBlown.classList.add('fade-in');
-                if (statusBadge) statusBadge.innerHTML = '💖 Thổi Nến Thành Công Rồiii! 🎂✨';
+                if (statusBadge) statusBadge.innerHTML = '🎉 Ú òaaaaa! 🎂✨';
 
                 // 4. CHIBI FINISHED BLOWING -> REVEAL "CHÚC MỪNG SINH NHẬT" & CELEBRATION!
                 setTimeout(() => {
@@ -696,7 +696,7 @@ function initScratchCard() {
         }
     }
 
-    const secretLetterWrapper = document.querySelector('.secret-letter-content');
+    const secretLetterWrapper = document.getElementById('secret-letter-wrapper');
     if (secretLetterWrapper) {
         secretLetterWrapper.addEventListener('click', () => {
             if (scratchedPercentage > 40) {
@@ -955,6 +955,9 @@ function showLetterPopup() {
         document.body.style.overflow = '';
         if (letterTypeTimeout) clearTimeout(letterTypeTimeout);
         isLetterTyping = false;
+
+        // Reveal the secret letter on the main card outside NOW that popup is closed
+        revealSecretLetterOutside();
     };
 
     if (closeBtn) closeBtn.onclick = (e) => { e.stopPropagation(); closePopup(); };
@@ -1006,6 +1009,38 @@ function showLetterPopup() {
     }
 
     letterTypeTimeout = setTimeout(typeNextChar, 500);
+}
+
+// Reveal secret letter on outside card only after letter popup has been viewed and closed
+function revealSecretLetterOutside() {
+    const placeholder = document.getElementById('scratch-placeholder');
+    const letterWrapper = document.getElementById('secret-letter-wrapper');
+    const hintText = document.getElementById('scratch-sub-hint');
+
+    if (placeholder && placeholder.style.display !== 'none') {
+        gsap.to(placeholder, {
+            opacity: 0,
+            duration: 0.5,
+            onComplete: () => {
+                placeholder.style.display = 'none';
+                if (letterWrapper) {
+                    letterWrapper.classList.remove('letter-hidden');
+                    letterWrapper.classList.add('letter-revealed');
+                    gsap.fromTo(letterWrapper,
+                        { opacity: 0, y: 16 },
+                        { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }
+                    );
+                }
+            }
+        });
+    } else if (letterWrapper && letterWrapper.classList.contains('letter-hidden')) {
+        letterWrapper.classList.remove('letter-hidden');
+        letterWrapper.classList.add('letter-revealed');
+    }
+
+    if (hintText) {
+        hintText.innerHTML = '<i class="fa-solid fa-heart pink-heart"></i> Bức thư bí mật đã mở khóa! (Bấm vào thiệp để mở lại popup chữ bất cứ lúc nào ✨)';
+    }
 }
 
 
