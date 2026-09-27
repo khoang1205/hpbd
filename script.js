@@ -250,22 +250,43 @@ let blowEnergy = 0;
 
 async function startMicDetection() {
     const btnStartMic = document.getElementById('btn-start-mic');
+    const levelFill = document.getElementById('mic-level');
     try {
-        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Request microphone without auto-gain or aggressive noise cancellation to capture wind puff
+        try {
+            micStream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false
+                }
+            });
+        } catch (e) {
+            micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        }
+
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') {
+            audioContext.resume().catch(() => {});
+        }
+
         analyser = audioContext.createAnalyser();
-        
         const microphone = audioContext.createMediaStreamSource(micStream);
         microphone.connect(analyser);
-        analyser.fftSize = 256;
-        analyser.smoothingTimeConstant = 0.3;
+
+        analyser.fftSize = 512;
+        analyser.smoothingTimeConstant = 0.4;
 
         micStartTime = Date.now();
         ambientBaseline = 0;
         blowEnergy = 0;
 
+        if (levelFill) {
+            levelFill.style.width = '0%';
+        }
+
         if (btnStartMic) {
-            btnStartMic.innerHTML = `<i class="fa-solid fa-microphone-lines"></i> Mic Đã Bật! Hãy Thổi Vào Mic`;
+            btnStartMic.innerHTML = `<i class="fa-solid fa-wind"></i> Đang Lắng Nghe... Thổi "Phùuu" Vào Mic Nhé!`;
             btnStartMic.style.background = 'linear-gradient(135deg, #b8f2e6 0%, #a2d2ff 100%)';
             btnStartMic.style.color = '#1b4965';
         }
@@ -280,47 +301,54 @@ async function startMicDetection() {
 function listenMicVolume() {
     if (isCandleBlown || !analyser) return;
 
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteFrequencyData(dataArray);
+    // 1. Time Domain Waveform Data (detects direct physical air pressure / wind rumble on mic diaphragm)
+    const timeData = new Uint8Array(analyser.fftSize);
+    analyser.getByteTimeDomainData(timeData);
 
-    // 1. Calculate overall volume average
-    let sum = 0;
-    for (let i = 0; i < dataArray.length; i++) {
-        sum += dataArray[i];
+    let maxDeviation = 0;
+    let totalDeviation = 0;
+    for (let i = 0; i < timeData.length; i++) {
+        const deviation = Math.abs(timeData[i] - 128);
+        totalDeviation += deviation;
+        if (deviation > maxDeviation) maxDeviation = deviation;
     }
-    const average = sum / dataArray.length;
+    const avgDeviation = totalDeviation / timeData.length;
 
-    // 2. Calculate low-frequency blow turbulence energy (bins 0 to 8: < 350Hz)
+    // 2. Frequency Domain Data (low frequency wind turbulence rumble < 150Hz)
+    const freqData = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(freqData);
+
+    const lowBinsCount = Math.min(6, freqData.length);
     let lowFreqSum = 0;
-    const lowBinsCount = Math.min(8, dataArray.length);
     for (let i = 0; i < lowBinsCount; i++) {
-        lowFreqSum += dataArray[i];
+        lowFreqSum += freqData[i];
     }
-    const lowFreqAvg = lowFreqSum / lowBinsCount;
+    const lowFreqRumble = lowFreqSum / lowBinsCount;
 
     const elapsed = Date.now() - micStartTime;
+    const levelFill = document.getElementById('mic-level');
 
-    // 3. Calibration phase (first 1000ms): measure ambient room baseline
-    if (elapsed < 1000) {
-        if (ambientBaseline === 0) ambientBaseline = average;
-        else ambientBaseline = (ambientBaseline * 0.85) + (average * 0.15);
+    // 3. Calibration phase (first 800ms) to measure ambient room noise
+    if (elapsed < 800) {
+        if (ambientBaseline === 0) ambientBaseline = avgDeviation;
+        else ambientBaseline = (ambientBaseline * 0.85) + (avgDeviation * 0.15);
+        if (levelFill) levelFill.style.width = '0%';
         requestAnimationFrame(listenMicVolume);
         return;
     }
 
-    // 4. Check if user is actually blowing into the mic
-    // Genuine blowing generates heavy low-frequency wind turbulence (lowFreqAvg > 95)
-    const blowThreshold = Math.max(65, ambientBaseline + 25);
-    const isBlowing = (lowFreqAvg > 90 && average > blowThreshold) || (average > 115) || (lowFreqAvg > 140);
+    // 4. Genuine Blowing Detection:
+    // Real blowing into a microphone produces high wave deviation (saturation) AND heavy low frequency rumble.
+    // Background noise, fans, or normal speaking CANNOT satisfy both conditions simultaneously.
+    const isRealBlowing = (avgDeviation > Math.max(18, ambientBaseline + 14) && maxDeviation > 55 && lowFreqRumble > 95) ||
+                          (avgDeviation > 32 && maxDeviation > 75);
 
-    const levelFill = document.getElementById('mic-level');
-
-    if (isBlowing) {
-        // Accumulate blow energy (requires steady blow ~300ms)
-        blowEnergy += 12;
+    if (isRealBlowing) {
+        // Build up energy smoothly - requires genuine continuous blowing for ~0.7s
+        blowEnergy += 3.2;
         if (levelFill) {
-            levelFill.style.width = `${Math.min(100, blowEnergy)}%`;
-            levelFill.style.background = 'linear-gradient(90deg, #ff85a2, #ff477e)';
+            levelFill.style.width = `${Math.min(100, Math.round(blowEnergy))}%`;
+            levelFill.style.background = 'linear-gradient(90deg, #ff85a2 0%, #ff477e 100%)';
         }
 
         if (blowEnergy >= 100) {
@@ -328,12 +356,11 @@ function listenMicVolume() {
             return;
         }
     } else {
-        // Decay energy quickly when not blowing
-        blowEnergy = Math.max(0, blowEnergy - 5);
+        // Quickly decay energy if user stops blowing
+        blowEnergy = Math.max(0, blowEnergy - 4.5);
         if (levelFill) {
-            const displayLevel = Math.max(0, Math.min(100, ((average - ambientBaseline) / 40) * 100));
-            levelFill.style.width = `${Math.max(blowEnergy, displayLevel * 0.25)}%`;
-            levelFill.style.background = 'linear-gradient(90deg, #b8f2e6, #ff85a2)';
+            levelFill.style.width = `${Math.round(blowEnergy)}%`;
+            levelFill.style.background = 'linear-gradient(90deg, #b8f2e6 0%, #ff85a2 100%)';
         }
     }
 
