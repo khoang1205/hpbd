@@ -32,8 +32,12 @@
     <!-- ==================== SECTION 1: UNLOCK QUIZ ==================== -->
     <section id="unlock-section" class="active-section">
         <div class="glass-card quiz-card">
-            <div class="gift-icon-wrapper">
-                <i class="fa-solid fa-gift gift-bounce"></i>
+            <div class="gift-box-wrapper" id="gift-box-wrapper">
+                <div class="gift-lid" id="gift-lid"></div>
+                <div class="gift-body">
+                    🎁
+                    <div class="gift-shine"></div>
+                </div>
             </div>
             <h2 class="section-title">Mở Hộp Quà Bí Mật ✨</h2>
             <p id="quiz-question" class="quiz-question-text">Đang tải câu hỏi...</p>
@@ -145,6 +149,12 @@
                 <button id="btn-music-toggle" class="btn-music">
                     <i class="fa-solid fa-compact-disc fa-spin spinner-music" id="music-disc-icon"></i>
                     <span id="music-status-text">Đang phát nhạc</span>
+                    <!-- Equalizer bars (visible when playing) -->
+                    <div class="equalizer-bars" id="equalizer-bars">
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                    </div>
                 </button>
             </div>
         </header>

@@ -67,18 +67,37 @@ function initAmbientElements() {
     const container = document.getElementById('floating-elements-container');
     if (!container) return;
 
-    // Friendly celebration icons
-    const icons = ['✨', '🌸', '⭐', '🎈', '🎂', '🎉', '🎁'];
-    const totalCount = 18;
+    // Friendly celebration icons (expanded set)
+    const iconsLarge = ['✨', '🌸', '⭐', '🎈', '🎂', '🎉', '🎁', '💕', '🌟', '💖', '🌺', '💫'];
+    const iconsSm    = ['🦋', '🍀', '💕', '🌟', '💫', '✨', '🌸'];
 
-    for (let i = 0; i < totalCount; i++) {
+    const totalLarge = 18;
+    const totalSm    = 10; // small depth-variation elements
+
+    // Large elements
+    for (let i = 0; i < totalLarge; i++) {
         const el = document.createElement('div');
         el.className = 'floating-element';
-        el.textContent = icons[Math.floor(Math.random() * icons.length)];
+        el.textContent = iconsLarge[Math.floor(Math.random() * iconsLarge.length)];
         el.style.left = `${Math.random() * 95}%`;
         el.style.fontSize = `${Math.random() * 1.5 + 1}rem`;
         el.style.animationDuration = `${Math.random() * 8 + 8}s`;
         el.style.animationDelay = `${Math.random() * 5}s`;
+        container.appendChild(el);
+    }
+
+    // Small, slower elements with random horizontal drift (depth effect)
+    for (let i = 0; i < totalSm; i++) {
+        const el = document.createElement('div');
+        el.className = 'floating-element-sm';
+        el.textContent = iconsSm[Math.floor(Math.random() * iconsSm.length)];
+        el.style.left = `${Math.random() * 95}%`;
+        el.style.fontSize = `${Math.random() * 0.4 + 0.6}rem`; // 0.6–1rem
+        // Random horizontal drift: -30px to +30px
+        const drift = (Math.random() * 60 - 30).toFixed(0);
+        el.style.setProperty('--drift', `${drift}px`);
+        el.style.animationDuration = `${Math.random() * 10 + 14}s`; // 14–24s (slower)
+        el.style.animationDelay = `${Math.random() * 8}s`;
         container.appendChild(el);
     }
 }
@@ -116,16 +135,35 @@ function initQuizSection() {
         if (rawAns.length > 0 && isValid) {
             if (errorMsg) errorMsg.classList.add('hidden');
             inputAnswer.style.borderColor = '';
-            
-            // Trigger celebration confetti
+
+            // Trigger gift box open animation
+            const giftWrapper = document.getElementById('gift-box-wrapper');
+            if (giftWrapper) {
+                giftWrapper.classList.add('open');
+
+                // Fire confetti from the gift box position
+                const rect = giftWrapper.getBoundingClientRect();
+                const originX = (rect.left + rect.width / 2) / window.innerWidth;
+                const originY = (rect.top + rect.height / 2) / window.innerHeight;
+                confetti({
+                    particleCount: 60,
+                    spread: 70,
+                    origin: { x: originX, y: originY },
+                    colors: ['#ff85a2', '#c8b6ff', '#b5e2fa', '#ffb3c6', '#ffe5ec']
+                });
+            }
+
+            // Also trigger a secondary confetti burst
             confetti({
                 particleCount: 50,
                 spread: 60,
                 origin: { y: 0.6 }
             });
 
-            // Transition to Section 2 (Cake)
-            switchSection('unlock-section', 'cake-section');
+            // Transition to Section 2 (Cake) after gift animation completes
+            setTimeout(() => {
+                switchSection('unlock-section', 'cake-section');
+            }, 800);
         } else {
             if (errorMsg) {
                 errorMsg.classList.remove('hidden');
@@ -549,6 +587,8 @@ function initMusicPlayer() {
         audioEl.pause();
         if (discIcon) discIcon.classList.remove('fa-spin');
         if (statusText) statusText.textContent = 'Phát nhạc';
+        // Remove playing class -> stop musicPulse & hide equalizer
+        if (btnToggle) btnToggle.classList.remove('playing');
     }
 }
 
@@ -556,11 +596,14 @@ function playMusic() {
     const audioEl = document.getElementById('bg-music');
     const discIcon = document.getElementById('music-disc-icon');
     const statusText = document.getElementById('music-status-text');
+    const btnToggle = document.getElementById('btn-music-toggle');
 
     if (audioEl) {
         audioEl.play().then(() => {
             if (discIcon) discIcon.classList.add('fa-spin');
             if (statusText) statusText.textContent = 'Đang phát nhạc';
+            // Add playing class -> trigger musicPulse animation & show equalizer bars
+            if (btnToggle) btnToggle.classList.add('playing');
         }).catch(err => {
             console.warn("Autoplay prevented:", err);
         });
@@ -632,4 +675,69 @@ function initPhotoModal() {
     });
 }
 
+// ==================== 10. SPARKLE GLITTER EFFECT (Feature 1) ====================
+(function initSparkleGlitter() {
+    // Pastel glitter color palette
+    const glitterColors = [
+        '#ff85a2', '#ffb3c6', '#c8b6ff', '#e8dff5',
+        '#b5e2fa', '#fff176', '#ffcc80', '#f48fb1',
+        '#ce93d8', '#80deea'
+    ];
+
+    let lastSparkleTime = 0;
+    const THROTTLE_MS = 30; // max ~33 particles/second
+
+    function spawnGlitter(clientX, clientY) {
+        const now = Date.now();
+        if (now - lastSparkleTime < THROTTLE_MS) return;
+        lastSparkleTime = now;
+
+        // Spawn 2-4 particles per event for a richer effect
+        const count = Math.floor(Math.random() * 3) + 2;
+        for (let i = 0; i < count; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'glitter-particle';
+
+            // Random size 4-10px
+            const size = Math.random() * 6 + 4;
+            particle.style.width  = `${size}px`;
+            particle.style.height = `${size}px`;
+
+            // Random color (solid or gradient)
+            const colorA = glitterColors[Math.floor(Math.random() * glitterColors.length)];
+            const colorB = glitterColors[Math.floor(Math.random() * glitterColors.length)];
+            particle.style.background = `radial-gradient(circle, ${colorA}, ${colorB})`;
+
+            // Scatter around the cursor slightly
+            const scatter = 18;
+            const px = clientX + (Math.random() * scatter * 2 - scatter);
+            const py = clientY + (Math.random() * scatter * 2 - scatter);
+            particle.style.left = `${px - size / 2}px`;
+            particle.style.top  = `${py - size / 2}px`;
+
+            // Random animation duration 0.6s-1s
+            const dur = (Math.random() * 0.4 + 0.6).toFixed(2);
+            particle.style.animationDuration = `${dur}s`;
+
+            document.body.appendChild(particle);
+
+            // Remove particle after animation ends to prevent memory leak
+            particle.addEventListener('animationend', () => {
+                if (particle.parentNode) particle.parentNode.removeChild(particle);
+            });
+        }
+    }
+
+    // Mouse move listener
+    document.addEventListener('mousemove', (e) => {
+        spawnGlitter(e.clientX, e.clientY);
+    }, { passive: true });
+
+    // Touch move listener (mobile)
+    document.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches.length > 0) {
+            spawnGlitter(e.touches[0].clientX, e.touches[0].clientY);
+        }
+    }, { passive: true });
+})();
 
