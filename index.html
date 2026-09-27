@@ -61,72 +61,34 @@
             <div class="pastel-badge">Ước một điều ước nào ng đẹp ơi! ✨</div>
             <h1 class="celebration-heading">Chúc Mừng Sinh Nhật <span id="recipient-name-cake"></span>! 🌸</h1>
             
-            <!-- Chibi girl reveal after blowing candle -->
-            <div id="chibi-reveal" class="chibi-reveal-wrapper hidden">
-                <img src="assets/chibi_girl.jpg" alt="Chibi Birthday Girl" class="chibi-img">
-                <div class="chibi-sparkles"><span>✨</span><span>🌟</span><span>💖</span></div>
-            </div>
-
-            <!-- Kawaii Pastel 2D Cake Illustration -->
-            <div class="cake-container-2d">
+            <!-- Interactive Animated Chibi Blowing Birthday Cake Scene -->
+            <div class="chibi-cake-stage" id="chibi-cake-stage">
+                <!-- Warm Glow behind Candles -->
                 <div class="cake-glow-aura" id="cake-aura"></div>
-                
-                <div class="kawaii-cake">
-                    <div class="cake-plate-2d"></div>
-                    
-                    <!-- Bottom Tier -->
-                    <div class="tier-2d bottom-tier">
-                        <div class="scallop-drips">
-                            <span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span>
-                        </div>
-                        <div class="cherry-decorations">
-                            <span class="dot-cherry"></span><span class="dot-cherry"></span><span class="dot-cherry"></span>
-                        </div>
-                    </div>
 
-                    <!-- Top Tier -->
-                    <div class="tier-2d top-tier">
-                        <div class="scallop-drips">
-                            <span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span><span class="drip-drop"></span>
-                        </div>
-                        <!-- Strawberry Toppings on Top Tier -->
-                        <div class="strawberry-toppings">
-                            <span class="strawberry-item">🍓</span>
-                            <span class="strawberry-item">🍓</span>
-                            <span class="strawberry-item">🍓</span>
-                        </div>
-                    </div>
+                <!-- Frame 1: Chibi with burning candles & puffed cheeks ready to blow -->
+                <div class="chibi-stage-frame frame-burning" id="chibi-frame-burning">
+                    <img src="assets/chibi_burning.png" alt="Chibi Birthday Girl Blowing Cake" class="chibi-stage-img">
+                </div>
 
-                    <!-- 3 Candles securely placed on Top Tier -->
-                    <div class="candles-container-2d">
-                        <div class="candle-2d c-left">
-                            <div class="wick-2d"></div>
-                            <div class="flame-2d" id="flame-1"></div>
-                            <div class="smoke-2d" id="smoke-1"></div>
-                        </div>
-                        <div class="candle-2d c-center">
-                            <div class="wick-2d"></div>
-                            <div class="flame-2d" id="flame-2"></div>
-                            <div class="smoke-2d" id="smoke-2"></div>
-                        </div>
-                        <div class="candle-2d c-right">
-                            <div class="wick-2d"></div>
-                            <div class="flame-2d" id="flame-3"></div>
-                            <div class="smoke-2d" id="smoke-3"></div>
-                        </div>
-                    </div>
+                <!-- Animated Wind Breath Stream -->
+                <div class="blowing-wind-stream" id="blowing-wind-stream">
+                    <span class="wind-puff wp-1">💨</span>
+                    <span class="wind-puff wp-2">✨</span>
+                    <span class="wind-puff wp-3">💨</span>
+                    <span class="wind-sparkle">🌟</span>
+                </div>
 
-                    <!-- Cake Banner Badge -->
-                    <div class="cake-banner-2d">
-                        ✨ 09/10 ✨
-                    </div>
+                <!-- Frame 2: Chibi happy after blowing, candles extinguished with smoke -->
+                <div class="chibi-stage-frame frame-blown hidden" id="chibi-frame-blown">
+                    <img src="assets/chibi_blown.png" alt="Chibi Birthday Girl Happy" class="chibi-stage-img">
                 </div>
             </div>
 
             <!-- Candle Controls -->
             <div class="mic-control-box">
                 <p class="instruction-text">
-                    <i class="fa-solid fa-microphone-lines"></i> Nối Micro thoại và <b>THỔI MẠNH</b> vào mic để thổi tắt nến nhé!
+                    <i class="fa-solid fa-microphone-lines"></i> Thổi mạnh vào Mic (hoặc bấm nút) để thổi tắt nến nhé!
                 </p>
                 <div class="mic-status-bar">
                     <div id="mic-level" class="mic-level-fill"></div>

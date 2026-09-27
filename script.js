@@ -332,6 +332,41 @@ function listenMicVolume() {
     requestAnimationFrame(listenMicVolume);
 }
 
+// Web Audio Wind Synthesizer for blowing breath
+function playBlowingWindSound() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const bufferSize = ctx.sampleRate * 0.85;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1; // White noise
+        }
+
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(500, ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.35);
+        filter.frequency.exponentialRampToValueAtTime(350, ctx.currentTime + 0.8);
+        filter.Q.value = 2.5;
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.01, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.14, ctx.currentTime + 0.28);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.82);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+
+        noise.start();
+        noise.stop(ctx.currentTime + 0.85);
+    } catch (e) {}
+}
+
 function triggerBlowSuccess() {
     if (isCandleBlown) return;
     isCandleBlown = true;
@@ -348,24 +383,30 @@ function triggerBlowSuccess() {
         } catch (e) {}
     }
 
-    const flames = document.querySelectorAll('.flame-2d');
-    const smokes = document.querySelectorAll('.smoke-2d');
     const roomOverlay = document.getElementById('room-dim-overlay');
     const cakeAura = document.getElementById('cake-aura');
+    const windStream = document.getElementById('blowing-wind-stream');
+    const frameBurning = document.getElementById('chibi-frame-burning');
+    const frameBlown = document.getElementById('chibi-frame-blown');
 
-    // 1. Flames flicker wildly from blowing wind
-    flames.forEach(flame => flame.classList.add('flicker-out'));
+    // 1. Play blowing wind breath sound
+    playBlowingWindSound();
 
-    // 2. Dramatic momentary Blackout Flash (dập nến vụt tắt!)
+    // 2. Chibi character leans in to blow, wind puff bursts towards candles!
+    if (frameBurning) frameBurning.classList.add('is-blowing');
+    if (windStream) windStream.classList.add('active');
+
+    // 3. After blowing for 700ms, candle extinguishes with blackout flash!
     setTimeout(() => {
         if (roomOverlay) roomOverlay.classList.add('blackout');
-
-        // Extinguish flames & glowing aura
-        flames.forEach(flame => flame.classList.add('extinguished'));
         if (cakeAura) cakeAura.classList.add('extinguished');
-        smokes.forEach(smoke => smoke.classList.add('active'));
 
-        // 3. Room lights turn back on, fireworks explosion & music starts!
+        // Switch chibi frame from burning to happy blown candles!
+        if (frameBurning) frameBurning.classList.add('hidden');
+        if (frameBlown) frameBlown.classList.remove('hidden');
+        if (windStream) windStream.classList.remove('active');
+
+        // 4. Room lights turn back on, celebration begins, birthday music starts!
         setTimeout(() => {
             if (roomOverlay) {
                 roomOverlay.classList.remove('blackout');
@@ -375,13 +416,7 @@ function triggerBlowSuccess() {
             // Play Background Audio
             playMusic();
 
-            // 1. First reveal the cute Chibi girl with party hat & cake animation
-            const chibiReveal = document.getElementById('chibi-reveal');
-            if (chibiReveal) {
-                chibiReveal.classList.remove('hidden');
-            }
-
-            // 2. When Chibi girl animation finishes (~1.3s), reveal Celebration Heading!
+            // 5. As the blowing animation finishes, reveal the Celebration Heading!
             setTimeout(() => {
                 const heading = document.querySelector('.celebration-heading');
                 if (heading) {
@@ -393,14 +428,14 @@ function triggerBlowSuccess() {
 
                 // Trigger Big Celebration Confetti Burst with Heading
                 fireCelebrationConfetti();
-            }, 1300);
+            }, 800);
 
-            // 3. Ample time for the user to enjoy the magical birthday moment before playground
+            // 6. Give ample time for user to enjoy the magical birthday celebration
             setTimeout(() => {
                 switchSection('cake-section', 'playground-section');
-            }, 6000);
+            }, 6500);
         }, 350);
-    }, 400);
+    }, 700);
 }
 
 function fireCelebrationConfetti() {
