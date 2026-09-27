@@ -61,6 +61,12 @@
             <div class="pastel-badge">Ước một điều ước nào ng đẹp ơi! ✨</div>
             <h1 class="celebration-heading">Chúc Mừng Sinh Nhật <span id="recipient-name-cake"></span>! 🌸</h1>
             
+            <!-- Chibi girl reveal after blowing candle -->
+            <div id="chibi-reveal" class="chibi-reveal-wrapper hidden">
+                <img src="assets/chibi_girl.jpg" alt="Chibi Birthday Girl" class="chibi-img">
+                <div class="chibi-sparkles"><span>✨</span><span>🌟</span><span>💖</span></div>
+            </div>
+
             <!-- Kawaii Pastel 2D Cake Illustration -->
             <div class="cake-container-2d">
                 <div class="cake-glow-aura" id="cake-aura"></div>
@@ -225,6 +231,24 @@
                 <img id="modal-img" src="" alt="Photo Preview">
             </div>
             <p id="modal-caption" class="modal-caption"></p>
+        </div>
+    </div>
+
+    <!-- Letter Reveal Popup Modal -->
+    <div id="letter-popup" class="letter-popup hidden-modal">
+        <div class="letter-popup-backdrop" id="letter-popup-backdrop"></div>
+        <div class="letter-popup-content glass-card">
+            <button id="close-letter-popup" class="close-btn" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
+            <div class="letter-popup-header">
+                <i class="fa-solid fa-envelope-open-text letter-icon"></i>
+                <h3>Gửi ng đẹp! 💌</h3>
+            </div>
+            <div class="letter-popup-body">
+                <pre id="letter-popup-text" class="letter-popup-text"></pre><span class="typing-cursor">|</span>
+            </div>
+            <div class="letter-popup-footer">
+                <i class="fa-solid fa-star gold-star"></i> Chúc mừng sinh nhật ng đẹp!
+            </div>
         </div>
     </div>
 

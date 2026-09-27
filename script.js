@@ -375,13 +375,30 @@ function triggerBlowSuccess() {
             // Play Background Audio
             playMusic();
 
-            // Trigger Big Celebration Confetti Burst
-            fireCelebrationConfetti();
+            // 1. First reveal the cute Chibi girl with party hat & cake animation
+            const chibiReveal = document.getElementById('chibi-reveal');
+            if (chibiReveal) {
+                chibiReveal.classList.remove('hidden');
+            }
 
-            // Transition to Main Festival Playground
+            // 2. When Chibi girl animation finishes (~1.3s), reveal Celebration Heading!
+            setTimeout(() => {
+                const heading = document.querySelector('.celebration-heading');
+                if (heading) {
+                    gsap.fromTo(heading,
+                        { opacity: 0, y: 35, scale: 0.8 },
+                        { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }
+                    );
+                }
+
+                // Trigger Big Celebration Confetti Burst with Heading
+                fireCelebrationConfetti();
+            }, 1300);
+
+            // 3. Ample time for the user to enjoy the magical birthday moment before playground
             setTimeout(() => {
                 switchSection('cake-section', 'playground-section');
-            }, 2500);
+            }, 6000);
         }, 350);
     }, 400);
 }
@@ -539,9 +556,19 @@ function initScratchCard() {
                 onComplete: () => {
                     canvas.style.display = 'none';
                     confetti({ particleCount: 40, spread: 50 });
+                    setTimeout(() => showLetterPopup(), 600);
                 }
             });
         }
+    }
+
+    const secretLetterWrapper = document.querySelector('.secret-letter-content');
+    if (secretLetterWrapper) {
+        secretLetterWrapper.addEventListener('click', () => {
+            if (scratchedPercentage > 40) {
+                showLetterPopup();
+            }
+        });
     }
 }
 
@@ -740,4 +767,111 @@ function initPhotoModal() {
         }
     }, { passive: true });
 })();
+
+// ==================== 10. LETTER POPUP MODAL & TYPEWRITER ====================
+let isLetterTyping = false;
+let letterTypeTimeout = null;
+let typingAudioCtx = null;
+
+function showLetterPopup() {
+    const popup = document.getElementById('letter-popup');
+    const textEl = document.getElementById('letter-popup-text');
+    const cursor = document.querySelector('.typing-cursor');
+    const backdrop = document.getElementById('letter-popup-backdrop');
+    const closeBtn = document.getElementById('close-letter-popup');
+
+    if (!popup || !textEl) return;
+
+    popup.classList.remove('hidden-modal');
+    document.body.style.overflow = 'hidden';
+
+    // Sound generator
+    if (!typingAudioCtx) {
+        try {
+            typingAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {}
+    }
+
+    function playTypewriterKeySound() {
+        if (!typingAudioCtx) return;
+        try {
+            if (typingAudioCtx.state === 'suspended') {
+                typingAudioCtx.resume();
+            }
+            const osc = typingAudioCtx.createOscillator();
+            const gain = typingAudioCtx.createGain();
+            
+            // Soft mechanical typewriter sound
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(550 + Math.random() * 350, typingAudioCtx.currentTime);
+            
+            gain.gain.setValueAtTime(0.03, typingAudioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0005, typingAudioCtx.currentTime + 0.04);
+            
+            osc.connect(gain);
+            gain.connect(typingAudioCtx.destination);
+            
+            osc.start();
+            osc.stop(typingAudioCtx.currentTime + 0.045);
+        } catch (e) {}
+    }
+
+    const closePopup = () => {
+        popup.classList.add('hidden-modal');
+        document.body.style.overflow = '';
+        if (letterTypeTimeout) clearTimeout(letterTypeTimeout);
+        isLetterTyping = false;
+    };
+
+    if (closeBtn) closeBtn.onclick = (e) => { e.stopPropagation(); closePopup(); };
+    if (backdrop) backdrop.onclick = closePopup;
+
+    document.addEventListener('keydown', function escHandler(e) {
+        if (e.key === 'Escape' && !popup.classList.contains('hidden-modal')) {
+            closePopup();
+            document.removeEventListener('keydown', escHandler);
+        }
+    });
+
+    const fullText = (typeof CONFIG !== 'undefined' && CONFIG.secretLetter) 
+        ? CONFIG.secretLetter 
+        : 'Chúc mừng sinh nhật ng đẹp nha! 🎉✨\n\nChúc ng đẹp luôn rực rỡ và hạnh phúc!';
+    
+    textEl.textContent = '';
+    if (cursor) cursor.style.display = 'inline-block';
+    
+    if (letterTypeTimeout) clearTimeout(letterTypeTimeout);
+    let i = 0;
+    isLetterTyping = true;
+
+    function typeNextChar() {
+        if (!isLetterTyping) return;
+        if (i < fullText.length) {
+            const ch = fullText[i];
+            textEl.textContent += ch;
+            i++;
+
+            if (ch !== ' ' && ch !== '\n') {
+                playTypewriterKeySound();
+            }
+
+            let delay = 35 + Math.random() * 20;
+            if (ch === '\n') delay = 240;
+            else if (ch === '.' || ch === '!' || ch === '?') delay = 180;
+            else if (ch === ',') delay = 90;
+
+            letterTypeTimeout = setTimeout(typeNextChar, delay);
+        } else {
+            isLetterTyping = false;
+            if (cursor) {
+                setTimeout(() => {
+                    cursor.style.display = 'none';
+                }, 1500);
+            }
+        }
+    }
+
+    letterTypeTimeout = setTimeout(typeNextChar, 500);
+}
+
 
