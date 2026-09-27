@@ -286,7 +286,7 @@ async function startMicDetection() {
         }
 
         if (btnStartMic) {
-            btnStartMic.innerHTML = `<i class="fa-solid fa-wind"></i> Đang Lắng Nghe... Thổi "Phùuu" Vào Mic Nhé!`;
+            btnStartMic.innerHTML = `<i class="fa-solid fa-microphone-lines"></i> Mic Đã Bật Rồi Nè! Thổi Vào Mic Nhéeee ✨`;
             btnStartMic.style.background = 'linear-gradient(135deg, #b8f2e6 0%, #a2d2ff 100%)';
             btnStartMic.style.color = '#1b4965';
         }
