@@ -14,6 +14,9 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <!-- GSAP for smooth animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Preload Chibi Animation Images for Instant Mobile Rendering -->
+    <link rel="preload" as="image" href="assets/chibi_burning.png">
+    <link rel="preload" as="image" href="assets/chibi_blown.png">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -220,7 +223,7 @@
     <div id="chibi-blowing-modal" class="modal hidden-modal">
         <div class="modal-backdrop-overlay" id="chibi-modal-backdrop"></div>
         <div class="modal-content chibi-modal-content glass-card">
-            <div class="chibi-modal-badge">✨ Bé Chibi Thổi Nến Cùng Ng Đẹp ✨</div>
+            <div class="chibi-modal-badge" id="chibi-status-badge">✨ Bé Chibi Đang Chuẩn Bị Thổi Nến ✨</div>
             <div class="chibi-cake-stage" id="chibi-cake-stage">
                 <!-- Warm Glow behind Candles -->
                 <div class="cake-glow-aura" id="chibi-cake-aura"></div>
@@ -260,6 +263,15 @@
                         <span>💖</span><span>🌸</span><span>✨</span><span>🌟</span>
                     </div>
                 </div>
+            </div>
+
+            <!-- Celebration Heading revealed after chibi finishes blowing -->
+            <div id="chibi-celebration-box" class="chibi-celebration-box hidden">
+                <h2 class="chibi-celebration-title">🎉 Chúc Mừng Sinh Nhật <span id="chibi-recipient-name">ng đẹp ✨</span>! 🌸</h2>
+                <p class="chibi-celebration-sub">Ước một điều ước thật ngọt ngào & tuổi mới luôn rực rỡ nha! ✨</p>
+                <button id="btn-chibi-proceed" class="btn-pastel btn-chibi-proceed">
+                    <i class="fa-solid fa-gift"></i> Khám Phá Quà & Góc Kỷ Niệm 📸 💌
+                </button>
             </div>
         </div>
     </div>

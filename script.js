@@ -2,6 +2,12 @@
 // PASTEL BIRTHDAY WEBSITE - INTERACTIVE LOGIC (KAWAII 2D EDITION)
 // ===================================================
 
+// Preload chibi frames immediately to guarantee zero-latency rendering on phones
+const chibiPreload1 = new Image();
+chibiPreload1.src = 'assets/chibi_burning.png';
+const chibiPreload2 = new Image();
+chibiPreload2.src = 'assets/chibi_blown.png';
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Load Configurations from CONFIG
     initAppConfig();
@@ -37,6 +43,7 @@ function initAppConfig() {
 
     // Set recipient name in UI
     const cakeName = document.getElementById('recipient-name-cake');
+    const chibiRecipientName = document.getElementById('chibi-recipient-name');
     const navName = document.getElementById('nav-recipient-name');
     const footerName = document.getElementById('footer-recipient');
     const quizQuestion = document.getElementById('quiz-question');
@@ -45,6 +52,7 @@ function initAppConfig() {
     const audioEl = document.getElementById('bg-music');
 
     if (cakeName) cakeName.textContent = CONFIG.recipientName;
+    if (chibiRecipientName) chibiRecipientName.textContent = CONFIG.recipientName;
     if (navName) navName.textContent = CONFIG.recipientName;
     if (footerName) footerName.textContent = CONFIG.recipientName;
 
@@ -335,9 +343,11 @@ function listenMicVolume() {
 // Web Audio Wind Synthesizer for blowing breath
 function playBlowingWindSound() {
     try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
         if (ctx.state === 'suspended') {
-            ctx.resume();
+            ctx.resume().catch(() => {});
         }
         const bufferSize = ctx.sampleRate * 0.85;
         const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -391,24 +401,52 @@ function triggerBlowSuccess() {
     const roomOverlay = document.getElementById('room-dim-overlay');
     const cakeAura = document.getElementById('cake-aura');
     const chibiModal = document.getElementById('chibi-blowing-modal');
+    const statusBadge = document.getElementById('chibi-status-badge');
     const windStream = document.getElementById('blowing-wind-stream');
     const frameBurning = document.getElementById('chibi-frame-burning');
     const frameBlown = document.getElementById('chibi-frame-blown');
     const flameOverlay = document.getElementById('candle-flame-overlay');
+    const chibiCelebBox = document.getElementById('chibi-celebration-box');
+    const chibiRecipientName = document.getElementById('chibi-recipient-name');
+    const btnChibiProceed = document.getElementById('btn-chibi-proceed');
+
+    // Fill recipient name in chibi modal
+    if (chibiRecipientName && typeof CONFIG !== 'undefined' && CONFIG.recipientName) {
+        chibiRecipientName.textContent = CONFIG.recipientName;
+    }
 
     // 1. First: 2D cake flames flicker violently from user blowing
     flames2D.forEach(flame => flame.classList.add('flicker-out'));
 
-    // 2. Extinguish 2D cake candles, smoke rises, moment of blackout flash
+    // 2. Extinguish 2D cake candles, smoke rises
     setTimeout(() => {
         flames2D.forEach(flame => flame.classList.add('extinguished'));
         smokes2D.forEach(smoke => smoke.classList.add('active'));
         if (cakeAura) cakeAura.classList.add('extinguished');
-        if (roomOverlay) roomOverlay.classList.add('blackout');
 
         // 3. POPUP THE CHIBI BLOWING ANIMATION MODAL!
         setTimeout(() => {
-            if (chibiModal) chibiModal.classList.remove('hidden-modal');
+            if (roomOverlay) {
+                roomOverlay.classList.remove('blackout');
+            }
+
+            if (chibiModal) {
+                chibiModal.classList.remove('hidden-modal');
+                chibiModal.style.opacity = '1';
+            }
+
+            // Reset frame states in case of re-trigger
+            if (frameBurning) {
+                frameBurning.classList.remove('fade-out');
+                frameBurning.classList.remove('is-blowing');
+            }
+            if (frameBlown) frameBlown.classList.remove('fade-in');
+            if (flameOverlay) {
+                flameOverlay.classList.remove('bending');
+                flameOverlay.classList.remove('extinguished');
+            }
+            if (chibiCelebBox) chibiCelebBox.classList.add('hidden');
+            if (statusBadge) statusBadge.textContent = '✨ Bé Chibi Đang Thổi Nến... ✨';
 
             // Play realistic blowing wind breath sound
             playBlowingWindSound();
@@ -420,64 +458,83 @@ function triggerBlowSuccess() {
             // Wind hits candles: flames bend flat and waver
             setTimeout(() => {
                 if (flameOverlay) flameOverlay.classList.add('bending');
-            }, 250);
+            }, 300);
 
             // Flames extinguish on chibi cake, chibi morphs into joyful laughing face!
             setTimeout(() => {
                 if (flameOverlay) flameOverlay.classList.add('extinguished');
+                if (windStream) windStream.classList.remove('active');
                 if (frameBurning) frameBurning.classList.add('fade-out');
                 if (frameBlown) frameBlown.classList.add('fade-in');
-                if (windStream) windStream.classList.remove('active');
+                if (statusBadge) statusBadge.innerHTML = '💖 Thổi Nến Thành Công Rồiii! 🎂✨';
 
-                // 4. WHEN the Chibi animation finishes: Close modal & Reveal Celebration!
+                // 4. CHIBI FINISHED BLOWING -> REVEAL "CHÚC MỪNG SINH NHẬT" & CELEBRATION!
                 setTimeout(() => {
-                    // Smoothly hide chibi popup modal
-                    if (chibiModal) {
-                        gsap.to(chibiModal, {
-                            opacity: 0,
-                            scale: 0.85,
-                            duration: 0.5,
-                            onComplete: () => {
-                                chibiModal.classList.add('hidden-modal');
-                                chibiModal.style.opacity = '';
-                                chibiModal.style.transform = '';
-                            }
-                        });
-                    }
-
-                    // Room lights brighten back up
-                    if (roomOverlay) {
-                        roomOverlay.classList.remove('blackout');
-                        roomOverlay.classList.remove('dimmed');
-                    }
-
                     // Start background birthday celebration music
                     playMusic();
 
-                    // 5. REVEAL THE CELEBRATION HEADING!
-                    setTimeout(() => {
-                        const heading = document.querySelector('.celebration-heading');
-                        if (heading) {
-                            gsap.fromTo(heading,
-                                { opacity: 0, y: 35, scale: 0.8 },
-                                { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }
-                            );
+                    // Massive celebration confetti explosion!
+                    fireCelebrationConfetti();
+
+                    // Show celebration heading inside the Chibi Modal!
+                    if (chibiCelebBox) {
+                        chibiCelebBox.classList.remove('hidden');
+                        gsap.fromTo(chibiCelebBox,
+                            { opacity: 0, scale: 0.8, y: 25 },
+                            { opacity: 1, scale: 1, y: 0, duration: 0.9, ease: 'back.out(2)' }
+                        );
+                    }
+
+                    // Also reveal celebration heading on Section 2 background
+                    const heading = document.querySelector('.celebration-heading');
+                    if (heading) {
+                        gsap.fromTo(heading,
+                            { opacity: 0, y: 30, scale: 0.85 },
+                            { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }
+                        );
+                    }
+
+                    // Handlers to transition to Section 3 (Playground)
+                    let hasProceeded = false;
+                    const proceedToPlayground = () => {
+                        if (hasProceeded) return;
+                        hasProceeded = true;
+
+                        if (chibiModal) {
+                            gsap.to(chibiModal, {
+                                opacity: 0,
+                                scale: 0.9,
+                                duration: 0.5,
+                                onComplete: () => {
+                                    chibiModal.classList.add('hidden-modal');
+                                    chibiModal.style.opacity = '';
+                                    chibiModal.style.transform = '';
+                                    switchSection('cake-section', 'playground-section');
+                                }
+                            });
+                        } else {
+                            switchSection('cake-section', 'playground-section');
                         }
+                    };
 
-                        // Massive celebration confetti explosion!
-                        fireCelebrationConfetti();
-                    }, 400);
+                    // Button click / touch in modal
+                    if (btnChibiProceed) {
+                        btnChibiProceed.onclick = (e) => {
+                            e.stopPropagation();
+                            proceedToPlayground();
+                        };
+                    }
 
-                    // 6. Transition to Main Festival Playground after user enjoys the celebration
+                    // Auto-proceed after user has enjoyed the celebration for 8 seconds
                     setTimeout(() => {
-                        switchSection('cake-section', 'playground-section');
-                    }, 6500);
+                        proceedToPlayground();
+                    }, 8000);
 
-                }, 1600); // Wait for user to enjoy happy chibi with smoke & hearts
-            }, 750); // Active blowing duration
+                }, 600); // Short pause for user to enjoy the laughing chibi before text & confetti explode
+            }, 850); // Wind blowing duration
 
-        }, 300); // Blackout delay before chibi popup
-    }, 400); // 2D candle flicker duration
+        }, 200); // Quick transition to chibi modal
+    }, 350); // 2D candle flicker duration
 }
 
 function fireCelebrationConfetti() {
