@@ -481,7 +481,6 @@ section {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
 .chibi-stage-img {
@@ -494,9 +493,9 @@ section {
     -webkit-user-drag: none;
 }
 
-/* Lean in during blowing */
+/* Inhale and lean in during blowing */
 .frame-burning.is-blowing .chibi-stage-img {
-    animation: chibiBlowLean 0.75s ease-in-out forwards;
+    animation: chibiBlowLean 0.85s ease-in-out forwards;
 }
 
 @keyframes chibiIdle {
@@ -505,49 +504,195 @@ section {
 }
 
 @keyframes chibiBlowLean {
-    0%   { transform: translateY(0) scale(1); }
-    35%  { transform: translateY(-4px) scale(1.06) rotate(-3deg); }
-    100% { transform: translateY(-4px) scale(1.06) rotate(-3deg); }
+    0%   { transform: translateY(0) scale(1) rotate(0deg); }
+    18%  { transform: translateY(4px) scale(0.97) rotate(2deg); } /* Inhale wind-up */
+    45%  { transform: translateY(-6px) scale(1.08) rotate(-4deg); } /* Active blow forward */
+    85%  { transform: translateY(-6px) scale(1.08) rotate(-4deg); }
+    100% { transform: translateY(0) scale(1) rotate(0deg); }
 }
 
-/* Wind stream coming from mouth to candles */
+/* Dynamic Flickering Candle Flame Overlays on top of the cake */
+.candle-flame-overlay {
+    position: absolute;
+    top: 45%;
+    left: 60%;
+    width: 34px;
+    height: 18px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    z-index: 5;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.chibi-flame {
+    width: 7px;
+    height: 13px;
+    background: radial-gradient(ellipse at 50% 80%, #ffffff 0%, #fff176 25%, #ff9800 60%, #ff3d00 90%);
+    border-radius: 50% 50% 25% 25%;
+    box-shadow: 0 0 10px 3px rgba(255, 235, 59, 0.85), 0 0 20px 6px rgba(255, 112, 67, 0.6);
+    animation: chibiFlameFlicker 0.35s infinite alternate ease-in-out;
+}
+
+.chibi-flame:nth-child(2) { animation-delay: 0.12s; height: 14px; }
+.chibi-flame:nth-child(3) { animation-delay: 0.24s; }
+
+@keyframes chibiFlameFlicker {
+    0%   { transform: scale(1) rotate(-4deg); }
+    100% { transform: scale(1.22) rotate(5deg); }
+}
+
+/* Flames bend hard when wind breath blasts them */
+.candle-flame-overlay.bending .chibi-flame {
+    transform: scale(0.5, 1.4) rotate(55deg) translateX(6px) !important;
+    opacity: 0.7;
+    filter: blur(0.5px);
+}
+
+.candle-flame-overlay.extinguished {
+    opacity: 0 !important;
+    transform: scale(0) !important;
+}
+
+/* Wind stream originating directly from her mouth towards candles */
 .blowing-wind-stream {
     position: absolute;
-    top: 40%;
-    left: 46%;
+    top: 42%;
+    left: 53%;
     display: none;
+    align-items: center;
     pointer-events: none;
     z-index: 10;
 }
 
 .blowing-wind-stream.active {
     display: flex;
-    gap: 8px;
-    animation: windGustStream 0.7s ease-out forwards;
+    gap: 4px;
+    animation: windGustStream 0.75s ease-out forwards;
+}
+
+.wind-swirl {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.95), transparent);
+    border-radius: 4px;
+    box-shadow: 0 0 8px rgba(180, 240, 255, 0.9);
+    animation: swirlSlide 0.55s ease-out forwards;
+}
+
+.ws-1 { width: 30px; animation-delay: 0.05s; }
+.ws-2 { width: 45px; animation-delay: 0.15s; }
+
+@keyframes swirlSlide {
+    0%   { width: 4px; opacity: 0; transform: translateX(0); }
+    40%  { opacity: 1; }
+    100% { width: 50px; opacity: 0; transform: translateX(35px); }
 }
 
 .wind-puff {
     font-size: 1.6rem;
-    animation: windPuffFloat 0.65s ease-out forwards;
+    animation: windPuffFloat 0.7s ease-out forwards;
 }
 
 .wind-sparkle {
     font-size: 1.3rem;
     color: #ffd166;
-    animation: windPuffFloat 0.65s ease-out forwards;
+    animation: windPuffFloat 0.7s ease-out forwards;
     animation-delay: 0.1s;
 }
 
 @keyframes windGustStream {
     0%   { opacity: 0; transform: translate(0, 0) scale(0.5); }
-    30%  { opacity: 1; transform: translate(18px, -6px) scale(1.2); }
-    100% { opacity: 0; transform: translate(50px, -18px) scale(1.5); }
+    30%  { opacity: 1; transform: translate(16px, -4px) scale(1.2); }
+    100% { opacity: 0; transform: translate(45px, -12px) scale(1.5); }
 }
 
 @keyframes windPuffFloat {
     0%   { transform: scale(0.6) rotate(0deg); opacity: 0; }
-    50%  { opacity: 1; }
-    100% { transform: scale(1.4) rotate(15deg); opacity: 0; }
+    40%  { opacity: 1; }
+    100% { transform: scale(1.4) rotate(18deg); opacity: 0; }
+}
+
+/* Smoke curls wafting from extinguished wicks */
+.chibi-smoke-container {
+    position: absolute;
+    top: 41%;
+    left: 61%;
+    width: 34px;
+    height: 45px;
+    pointer-events: none;
+    z-index: 6;
+}
+
+.chibi-smoke-curl {
+    position: absolute;
+    bottom: 0;
+    width: 7px;
+    height: 18px;
+    background: rgba(220, 220, 235, 0.75);
+    border-radius: 50%;
+    filter: blur(2px);
+    animation: curlRise 2.4s infinite ease-out;
+}
+
+.chibi-smoke-curl.sm-1 { left: 2px; animation-delay: 0.1s; }
+.chibi-smoke-curl.sm-2 { left: 13px; animation-delay: 0.35s; }
+.chibi-smoke-curl.sm-3 { left: 24px; animation-delay: 0.6s; }
+
+@keyframes curlRise {
+    0%   { opacity: 0.9; transform: translateY(0) scale(1) rotate(0deg); }
+    50%  { opacity: 0.5; transform: translateY(-24px) scale(2) rotate(22deg); }
+    100% { opacity: 0;   transform: translateY(-50px) scale(3.5) rotate(-28deg); }
+}
+
+/* Celebration hearts that pop when she smiles */
+.celebration-hearts-burst {
+    position: absolute;
+    top: 15%;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    pointer-events: none;
+    z-index: 8;
+}
+
+.celebration-hearts-burst span {
+    font-size: 1.5rem;
+    animation: heartPopFloat 2s infinite ease-in-out alternate;
+}
+
+.celebration-hearts-burst span:nth-child(2) { animation-delay: 0.25s; }
+.celebration-hearts-burst span:nth-child(3) { animation-delay: 0.5s; }
+.celebration-hearts-burst span:nth-child(4) { animation-delay: 0.75s; }
+
+@keyframes heartPopFloat {
+    0%   { transform: translateY(0) scale(0.9) rotate(-6deg); opacity: 0.7; }
+    100% { transform: translateY(-14px) scale(1.3) rotate(8deg); opacity: 1; }
+}
+
+/* Smooth Cross-fade Frames */
+.frame-burning {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.frame-burning.fade-out {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+}
+
+.frame-blown {
+    opacity: 0;
+    transform: scale(0.92);
+    pointer-events: none;
+    transition: opacity 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.frame-blown.fade-in {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
 }
 
 /* Warm glow behind chibi's cake candles */
@@ -573,7 +718,7 @@ section {
 @keyframes auraPulse {
     0%   { transform: translateX(-50%) scale(0.95); opacity: 0.75; }
     100% { transform: translateX(-50%) scale(1.12); opacity: 1; }
-/* Mic Control Box */
+}/* Mic Control Box */
 .mic-control-box {
     background: rgba(255, 255, 255, 0.7);
     border-radius: 18px;

@@ -388,35 +388,42 @@ function triggerBlowSuccess() {
     const windStream = document.getElementById('blowing-wind-stream');
     const frameBurning = document.getElementById('chibi-frame-burning');
     const frameBlown = document.getElementById('chibi-frame-blown');
+    const flameOverlay = document.getElementById('candle-flame-overlay');
 
-    // 1. Play blowing wind breath sound
+    // 1. Play realistic blowing wind sound
     playBlowingWindSound();
 
-    // 2. Chibi character leans in to blow, wind puff bursts towards candles!
+    // 2. Chibi character starts inhale and lunges forward into the active blow!
     if (frameBurning) frameBurning.classList.add('is-blowing');
     if (windStream) windStream.classList.add('active');
 
-    // 3. After blowing for 700ms, candle extinguishes with blackout flash!
+    // 3. Wind hits the candles: flames bend flat and waver violently
     setTimeout(() => {
+        if (flameOverlay) flameOverlay.classList.add('bending');
+    }, 250);
+
+    // 4. Flames extinguish under the wind force!
+    setTimeout(() => {
+        if (flameOverlay) flameOverlay.classList.add('extinguished');
         if (roomOverlay) roomOverlay.classList.add('blackout');
         if (cakeAura) cakeAura.classList.add('extinguished');
 
-        // Switch chibi frame from burning to happy blown candles!
-        if (frameBurning) frameBurning.classList.add('hidden');
-        if (frameBlown) frameBlown.classList.remove('hidden');
+        // Smoothly cross-fade from burning frame to happy laughing chibi frame!
+        if (frameBurning) frameBurning.classList.add('fade-out');
+        if (frameBlown) frameBlown.classList.add('fade-in');
         if (windStream) windStream.classList.remove('active');
 
-        // 4. Room lights turn back on, celebration begins, birthday music starts!
+        // 5. Room lights brighten back up, happy celebration music starts!
         setTimeout(() => {
             if (roomOverlay) {
                 roomOverlay.classList.remove('blackout');
                 roomOverlay.classList.remove('dimmed');
             }
 
-            // Play Background Audio
+            // Play Background Birthday Audio
             playMusic();
 
-            // 5. As the blowing animation finishes, reveal the Celebration Heading!
+            // 6. As the blowing animation finishes, reveal the Celebration Heading!
             setTimeout(() => {
                 const heading = document.querySelector('.celebration-heading');
                 if (heading) {
@@ -426,11 +433,11 @@ function triggerBlowSuccess() {
                     );
                 }
 
-                // Trigger Big Celebration Confetti Burst with Heading
+                // Trigger Big Celebration Confetti Burst
                 fireCelebrationConfetti();
             }, 800);
 
-            // 6. Give ample time for user to enjoy the magical birthday celebration
+            // 7. Ample time for the user to enjoy the celebratory moment
             setTimeout(() => {
                 switchSection('cake-section', 'playground-section');
             }, 6500);
