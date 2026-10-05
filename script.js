@@ -2,11 +2,48 @@
 // PASTEL BIRTHDAY WEBSITE - INTERACTIVE LOGIC (KAWAII 2D EDITION)
 // ===================================================
 
-// Preload chibi frames immediately to guarantee zero-latency rendering on phones
-const chibiPreload1 = new Image();
-chibiPreload1.src = 'assets/chibi_burning.png';
-const chibiPreload2 = new Image();
-chibiPreload2.src = 'assets/chibi_blown.png';
+// Preload eight small transparent chibi frames before the candle animation starts.
+const chibiFrameFiles = Array.from({ length: 8 }, (_, index) =>
+    `assets/chibi-frames/frame-${String(index + 1).padStart(2, '0')}.png`
+);
+const chibiFramePreloads = chibiFrameFiles.map(src => {
+    const frame = new Image();
+    frame.src = src;
+    return frame;
+});
+const chibiFrameDescriptions = [
+    'Thanh mỉm cười, cầm bánh sinh nhật có nến',
+    'Thanh nhìn xuống những ngọn nến',
+    'Thanh nghiêng người lại gần bánh kem',
+    'Thanh hít một hơi và nhìn vào bánh',
+    'Thanh bắt đầu thổi nến',
+    'Thanh tiếp tục thổi, các ngọn nến nghiêng theo luồng gió',
+    'Nến đã tắt, khói nhẹ bay lên',
+    'Thanh mỉm cười sau khi thổi nến'
+];
+const chibiFrameDurations = [400, 300, 360, 380, 680, 450, 650, 700];
+
+function playChibiBlowingFrames(image, onBlow) {
+    if (!image) return Promise.resolve();
+    let index = 0;
+    return new Promise(resolve => {
+        const showNextFrame = () => {
+            image.src = chibiFrameFiles[index];
+            image.alt = chibiFrameDescriptions[index];
+            if (index === 4 && onBlow) onBlow();
+            const duration = chibiFrameDurations[index];
+            if (index === chibiFrameFiles.length - 1) {
+                window.setTimeout(resolve, duration);
+            } else {
+                window.setTimeout(() => {
+                    index += 1;
+                    showNextFrame();
+                }, duration);
+            }
+        };
+        showNextFrame();
+    });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Load Configurations from CONFIG
@@ -432,8 +469,8 @@ function triggerBlowSuccess() {
     const statusBadge = document.getElementById('chibi-status-badge');
     const windStream = document.getElementById('blowing-wind-stream');
     const frameBurning = document.getElementById('chibi-frame-burning');
-    const frameBlown = document.getElementById('chibi-frame-blown');
-    const flameOverlay = document.getElementById('candle-flame-overlay');
+    const chibiAnimationFrame = document.getElementById('chibi-animation-frame');
+    const chibiCelebrationHearts = document.getElementById('chibi-celebration-hearts');
     const chibiCelebBox = document.getElementById('chibi-celebration-box');
     const chibiRecipientName = document.getElementById('chibi-recipient-name');
     const btnChibiProceed = document.getElementById('btn-chibi-proceed');
@@ -468,32 +505,23 @@ function triggerBlowSuccess() {
                 frameBurning.classList.remove('fade-out');
                 frameBurning.classList.remove('is-blowing');
             }
-            if (frameBlown) frameBlown.classList.remove('fade-in');
-            if (flameOverlay) {
-                flameOverlay.classList.remove('bending');
-                flameOverlay.classList.remove('extinguished');
-            }
             if (chibiCelebBox) chibiCelebBox.classList.add('hidden');
+            if (chibiCelebrationHearts) chibiCelebrationHearts.classList.add('hidden');
             if (statusBadge) statusBadge.textContent = '✨ Bé Chibi Đang Thổi Nến... ✨';
+            if (chibiAnimationFrame) {
+                chibiAnimationFrame.src = chibiFrameFiles[0];
+                chibiAnimationFrame.alt = chibiFrameDescriptions[0];
+            }
 
             // Play realistic blowing wind breath sound
             playBlowingWindSound();
 
-            // Chibi takes a breath and lunges forward blowing wind!
-            if (frameBurning) frameBurning.classList.add('is-blowing');
-            if (windStream) windStream.classList.add('active');
-
-            // Wind hits candles: flames bend flat and waver
-            setTimeout(() => {
-                if (flameOverlay) flameOverlay.classList.add('bending');
-            }, 300);
-
-            // Flames extinguish on chibi cake, chibi morphs into joyful laughing face!
-            setTimeout(() => {
-                if (flameOverlay) flameOverlay.classList.add('extinguished');
+            // Run the eight illustrated poses from looking at the cake to smiling at the end.
+            playChibiBlowingFrames(chibiAnimationFrame, () => {
+                if (windStream) windStream.classList.add('active');
+            }).then(() => {
                 if (windStream) windStream.classList.remove('active');
-                if (frameBurning) frameBurning.classList.add('fade-out');
-                if (frameBlown) frameBlown.classList.add('fade-in');
+                if (chibiCelebrationHearts) chibiCelebrationHearts.classList.remove('hidden');
                 if (statusBadge) statusBadge.innerHTML = '🎉 Ú òaaaaa! 🎂✨';
 
                 // 4. CHIBI FINISHED BLOWING -> REVEAL "CHÚC MỪNG SINH NHẬT" & CELEBRATION!
@@ -559,7 +587,7 @@ function triggerBlowSuccess() {
                     }, 8000);
 
                 }, 600); // Short pause for user to enjoy the laughing chibi before text & confetti explode
-            }, 850); // Wind blowing duration
+            });
 
         }, 200); // Quick transition to chibi modal
     }, 350); // 2D candle flicker duration
@@ -1070,4 +1098,3 @@ function revealSecretLetterOutside() {
         hintText.innerHTML = '<i class="fa-solid fa-heart pink-heart"></i> Bức thư bí mật đã mở khóa! (Bấm vào thiệp để mở lại popup chữ bất cứ lúc nào ✨)';
     }
 }
-
