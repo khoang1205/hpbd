@@ -630,7 +630,7 @@ function initPolaroidGallery() {
         emptyCard.style.maxWidth = '380px';
         emptyCard.style.width = '100%';
 
-        const emptyMsg = CONFIG.emptyPhotoMessage || "Vì toi không có ảnh nào của ng đẹp nên để ở đây tượng trưng, sau này có thì sẽ bổ sung sau ✨";
+        const emptyMsg = CONFIG.emptyPhotoMessage || "Chưa có ảnh của người đẹp và toi nên tạm để hình tượng trưng ở đây nha. Có ảnh rồi, toi sẽ bổ sung ngay ✨";
 
         emptyCard.innerHTML = `
             <div class="polaroid-tape"></div>

@@ -23,7 +23,7 @@ Chúc ng đẹp luôn mỉm cười thật tươi, luôn tràn đầy năng lư�
 Một lần nữa, chúc ng đẹp luôn luôn vui cười, thích cái gì sẽ được cái đó. hạp pi pớt đayyyy 🌸🎂🎈`,
 
     // Lời nhắn cho tường kỷ niệm khi chưa có ảnh
-    emptyPhotoMessage: "Vì toi không có ảnh nào của ng đẹp nên để ở đây tượng trưng, sau này có thì sẽ bổ sung sau ✨",
+    emptyPhotoMessage: "Chưa có ảnh của người đẹp và toi nên tạm để hình tượng trưng ở đây nha. Có ảnh rồi, toi sẽ bổ sung ngay ✨",
 
     // Danh sách ảnh kỷ niệm (Để trống để hiện khung tượng trưng như ban đầu)
     photos: [],
