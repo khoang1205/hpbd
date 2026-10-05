@@ -217,8 +217,9 @@ function switchSection(fromId, toId) {
                 gsap.fromTo(toEl, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.6 });
 
                 // Dim room ambient light for birthday cake candle moment
-                if (toId === 'cake-section' && roomOverlay) {
-                    roomOverlay.classList.add('dimmed');
+                if (roomOverlay) {
+                    roomOverlay.classList.toggle('dimmed', toId === 'cake-section');
+                    if (toId !== 'cake-section') roomOverlay.classList.remove('blackout');
                 }
             }
         });
@@ -1069,5 +1070,4 @@ function revealSecretLetterOutside() {
         hintText.innerHTML = '<i class="fa-solid fa-heart pink-heart"></i> Bức thư bí mật đã mở khóa! (Bấm vào thiệp để mở lại popup chữ bất cứ lúc nào ✨)';
     }
 }
-
 

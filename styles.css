@@ -10,9 +10,9 @@
     --pastel-purple: #c8b6ff;
     --pastel-blue: #b5e2fa;
     --pastel-mint: #d8f3dc;
-    --text-dark: #4a4e69;
-    --text-muted: #6c757d;
-    --glass-bg: rgba(255, 255, 255, 0.72);
+    --text-dark: #46364f;
+    --text-muted: #66546c;
+    --glass-bg: rgba(255, 255, 255, 0.94);
     --glass-border: rgba(255, 255, 255, 0.9);
     --glass-shadow: 0 12px 36px rgba(255, 133, 162, 0.18);
     --font-heading: 'Dancing Script', cursive;
@@ -27,7 +27,9 @@
 
 body {
     font-family: var(--font-main);
-    background: linear-gradient(135deg, #ffe5ec 0%, #f0e6ff 45%, #e8f5e9 100%);
+    background-color: #fffaf6;
+    background-image: radial-gradient(ellipse at top left, #fce7ef 0%, transparent 55%),
+        linear-gradient(150deg, #fffaf6 25%, #fff4f7 100%);
     background-attachment: fixed;
     color: var(--text-dark);
     min-height: 100vh;
@@ -48,6 +50,7 @@ body {
 }
 
 .pastel-blob {
+    display: none;
     position: absolute;
     border-radius: 50%;
     filter: blur(80px);
@@ -88,6 +91,7 @@ body {
 }
 
 /* Floating background hearts/stars */
+#floating-elements-container { opacity: 0.22; }
 .floating-element {
     position: absolute;
     user-select: none;
@@ -1300,7 +1304,7 @@ section {
 .hero-welcome h2 {
     font-family: var(--font-heading);
     font-size: 2.8rem;
-    color: var(--primary-pink);
+    color: #b52f63;
     margin-bottom: 8px;
 }
 
@@ -1308,7 +1312,7 @@ section {
 .section-subtitle {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #3d348b;
+    color: #51375f;
     margin-bottom: 6px;
     display: flex;
     align-items: center;
@@ -1317,7 +1321,7 @@ section {
 
 .sub-hint {
     font-size: 0.95rem;
-    color: var(--text-muted);
+    color: #66546c;
     margin-bottom: 20px;
 }
 

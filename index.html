@@ -18,6 +18,7 @@
     <link rel="preload" as="image" href="assets/chibi_burning.png">
     <link rel="preload" as="image" href="assets/chibi_blown.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="portrait-viewer.css">
 </head>
 <body>
 
@@ -181,13 +182,21 @@
             <!-- 2. Text Portrait Typography Art Section -->
             <div class="text-art-section">
                 <h3 class="section-subtitle"><i class="fa-solid fa-circle-question"></i> ???? ✨</h3>
-                <p class="sub-hint">đoán xem ảnh này là ảnh nào ✨</p>
+                <p class="sub-hint">Cụm từ nào toi sẽ dành cho bạn</p>
                 
-                <div class="text-portrait-wrapper" id="text-portrait-wrapper">
-                    <img id="text-portrait-img" src="assets/typography_thanh_color.png" alt="Bức họa chữ Thanh" loading="lazy">
-                    <div class="portrait-overlay">
-                        <span class="zoom-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> đoán xem ảnh này là ảnh nào ✨</span>
-                    </div>
+                <div class="text-portrait-gallery">
+                    <button type="button" class="text-portrait-wrapper" data-portrait-src="assets/typography_lan.svg" data-portrait-title="Tranh chữ Lan" aria-label="Mở tranh chữ Lan để phóng to">
+                        <img src="assets/typography_lan_480.jpg" srcset="assets/typography_lan_480.jpg 480w, assets/typography_lan_960.jpg 960w" sizes="(max-width: 640px) 90vw, 480px" width="2400" height="3200" alt="Bức họa bằng chữ Lan" loading="lazy" decoding="async">
+                    </button>
+                    <button type="button" class="text-portrait-wrapper" data-portrait-src="assets/typography_thanh.svg" data-portrait-title="Tranh chữ Thanh" aria-label="Mở tranh chữ Thanh để phóng to">
+                        <img src="assets/typography_thanh_480.jpg" srcset="assets/typography_thanh_480.jpg 480w, assets/typography_thanh_960.jpg 960w" sizes="(max-width: 640px) 90vw, 480px" width="2400" height="3200" alt="Bức họa bằng chữ Thanh" loading="lazy" decoding="async">
+                    </button>
+                    <button type="button" class="text-portrait-wrapper" data-portrait-src="assets/typography_xinh.svg" data-portrait-title="Tranh chữ Xinh" aria-label="Mở tranh chữ Xinh để phóng to">
+                        <img src="assets/typography_xinh_480.jpg" srcset="assets/typography_xinh_480.jpg 480w, assets/typography_xinh_960.jpg 960w" sizes="(max-width: 640px) 90vw, 480px" width="2400" height="3200" alt="Bức họa bằng chữ Xinh" loading="lazy" decoding="async">
+                    </button>
+                    <button type="button" class="text-portrait-wrapper" data-portrait-src="assets/typography_dep.svg" data-portrait-title="Tranh chữ Đẹp" aria-label="Mở tranh chữ Đẹp để phóng to">
+                        <img src="assets/typography_dep_480.jpg" srcset="assets/typography_dep_480.jpg 480w, assets/typography_dep_960.jpg 960w" sizes="(max-width: 640px) 90vw, 480px" width="2400" height="3200" alt="Bức họa bằng chữ Đẹp" loading="lazy" decoding="async">
+                    </button>
                 </div>
             </div>
 
@@ -316,11 +325,29 @@
         </div>
     </div>
 
+    <dialog id="portrait-viewer" aria-labelledby="portrait-viewer-title" aria-describedby="portrait-viewer-help">
+        <div class="portrait-toolbar">
+            <h2 id="portrait-viewer-title">Tranh chữ</h2>
+            <div class="portrait-controls">
+                <button type="button" data-zoom="out" aria-label="Thu nhỏ">−</button>
+                <button type="button" data-zoom="reset" aria-label="Vừa màn hình">100%</button>
+                <button type="button" data-zoom="in" aria-label="Phóng to">+</button>
+                <button type="button" data-close aria-label="Đóng tranh" autofocus>✕</button>
+            </div>
+        </div>
+        <p class="portrait-help" id="portrait-viewer-help">Chụm hai ngón để zoom · Kéo để xem · Chạm hai lần để phóng to</p>
+        <div class="portrait-viewport" tabindex="0" aria-label="Vùng xem tranh có thể phóng to và kéo">
+            <div class="portrait-stage"><img class="portrait-vector" alt="" draggable="false" hidden></div>
+        </div>
+        <p class="portrait-status" role="status"></p>
+    </dialog>
+
     <!-- Background Audio Element -->
     <audio id="bg-music" loop preload="auto"></audio>
 
     <script src="assets/thanh_art.js"></script>
     <script src="config.js"></script>
     <script src="script.js"></script>
+    <script src="portrait-viewer.js"></script>
 </body>
 </html>
