@@ -21,7 +21,7 @@ const chibiFrameDescriptions = [
     'Nến đã tắt, khói nhẹ bay lên',
     'Thanh mỉm cười sau khi thổi nến'
 ];
-const chibiFrameDurations = [400, 300, 360, 380, 680, 450, 650, 700];
+const chibiFrameDurations = [200, 150, 180, 190, 340, 225, 325, 350];
 
 function playChibiBlowingFrames(image, onBlow) {
     if (!image) return Promise.resolve();
