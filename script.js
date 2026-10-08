@@ -288,7 +288,7 @@ function initCandleBlowing() {
 
     if (btnManualBlow) {
         btnManualBlow.addEventListener('click', () => {
-            playMusic();
+            unlockMusicForMobile();
             triggerBlowSuccess();
         });
     }
@@ -829,7 +829,7 @@ function unlockMusicForMobile() {
     const previousVolume = audio.volume;
     audio.volume = 0;
     audio.play().then(() => {
-        if (!isCandleBlown) {
+        if (!musicHasStarted) {
             audio.pause();
             audio.currentTime = 0;
         }
