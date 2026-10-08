@@ -14,3 +14,6 @@
 !/assets/typography_*.svg
 !/assets/typography_*_480.jpg
 !/assets/typography_*_960.jpg
+!/assets/chibi-frames/
+/assets/chibi-frames/*
+!/assets/chibi-frames/frame-*.png
