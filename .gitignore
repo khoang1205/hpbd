@@ -1,0 +1,16 @@
+# Track only files used by the published website.
+/*
+!/.gitignore
+!/index.html
+!/styles.css
+!/portrait-viewer.css
+!/config.js
+!/script.js
+!/portrait-viewer.js
+!/YTSave_YouTube_Media_7A__FGKx1FE_CESFERKHOI-HÔM-NAY-SINH-NHẬT-AI-THẾ-OFFICIAL-MUSIC-VIDEO_009_128k.mp3
+!/assets/
+/assets/*
+!/assets/thanh_art.js
+!/assets/typography_*.svg
+!/assets/typography_*_480.jpg
+!/assets/typography_*_960.jpg
