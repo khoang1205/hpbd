@@ -274,15 +274,23 @@ let micStream;
 let isCandleBlown = false;
 
 function initCandleBlowing() {
+    const btnMusicRetry = document.getElementById('btn-music-retry');
+    if (btnMusicRetry) btnMusicRetry.addEventListener('click', playMusic);
     const btnStartMic = document.getElementById('btn-start-mic');
     const btnManualBlow = document.getElementById('btn-manual-blow');
 
     if (btnStartMic) {
-        btnStartMic.addEventListener('click', startMicDetection);
+        btnStartMic.addEventListener('click', () => {
+            unlockMusicForMobile();
+            startMicDetection();
+        });
     }
 
     if (btnManualBlow) {
-        btnManualBlow.addEventListener('click', triggerBlowSuccess);
+        btnManualBlow.addEventListener('click', () => {
+            playMusic();
+            triggerBlowSuccess();
+        });
     }
 }
 
@@ -581,6 +589,8 @@ function triggerBlowSuccess() {
                     if (btnChibiProceed) {
                         btnChibiProceed.onclick = (e) => {
                             e.stopPropagation();
+                            const audio = document.getElementById('bg-music');
+                            if (audio && audio.paused) playMusic();
                             proceedToPlayground();
                         };
                     }
@@ -813,28 +823,46 @@ function initMusicPlayer() {
     }
 }
 
+function unlockMusicForMobile() {
+    const audio = document.getElementById('bg-music');
+    if (!audio || !audio.paused) return;
+    const previousVolume = audio.volume;
+    audio.volume = 0;
+    audio.play().then(() => {
+        if (!isCandleBlown) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+        audio.volume = previousVolume;
+    }).catch(() => { audio.volume = previousVolume; });
+}
+
 let musicHasStarted = false;
 
-async function playMusic() {
+function playMusic() {
     const audioEl = document.getElementById('bg-music');
     const discIcon = document.getElementById('music-disc-icon');
     const statusText = document.getElementById('music-status-text');
     const btnToggle = document.getElementById('btn-music-toggle');
 
     if (audioEl) {
-        if (!musicHasStarted) {
-            if (audioEl.readyState < 1) {
-                await new Promise(resolve => audioEl.addEventListener('loadedmetadata', resolve, { once: true }));
-            }
+        // The MP3 is already trimmed; play immediately within the tap gesture.
+        if (!musicHasStarted && audioEl.readyState >= 1) {
             audioEl.currentTime = CONFIG.musicStartTime || 0;
         }
         audioEl.play().then(() => {
             musicHasStarted = true;
+            const retry = document.getElementById('btn-music-retry');
+            if (retry) retry.hidden = true;
             if (discIcon) discIcon.classList.add('fa-spin');
             if (statusText) statusText.textContent = 'Đang phát nhạc';
             // Add playing class -> trigger musicPulse animation & show equalizer bars
             if (btnToggle) btnToggle.classList.add('playing');
         }).catch(err => {
+            const retry = document.getElementById('btn-music-retry');
+            if (retry) retry.hidden = false;
+            if (discIcon) discIcon.classList.remove('fa-spin');
+            if (statusText) statusText.textContent = 'Phát nhạc';
             console.warn("Autoplay prevented:", err);
         });
     }

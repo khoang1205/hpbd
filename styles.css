@@ -2224,3 +2224,5 @@ section {
         font-size: 1.25rem;
     }
 }
+
+#btn-music-retry[hidden] { display: none !important; }
