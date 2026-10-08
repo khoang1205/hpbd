@@ -107,7 +107,7 @@ function initAppConfig() {
             audioEl.currentTime = CONFIG.musicStartTime || 0;
         };
         audioEl.addEventListener('loadedmetadata', seekToMusicStart, { once: true });
-        audioEl.src = CONFIG.musicUrl;
+        audioEl.src = `${CONFIG.musicUrl}#t=${CONFIG.musicStartTime || 0}`;
     }
 }
 
@@ -813,14 +813,23 @@ function initMusicPlayer() {
     }
 }
 
-function playMusic() {
+let musicHasStarted = false;
+
+async function playMusic() {
     const audioEl = document.getElementById('bg-music');
     const discIcon = document.getElementById('music-disc-icon');
     const statusText = document.getElementById('music-status-text');
     const btnToggle = document.getElementById('btn-music-toggle');
 
     if (audioEl) {
+        if (!musicHasStarted) {
+            if (audioEl.readyState < 1) {
+                await new Promise(resolve => audioEl.addEventListener('loadedmetadata', resolve, { once: true }));
+            }
+            audioEl.currentTime = CONFIG.musicStartTime || 0;
+        }
         audioEl.play().then(() => {
+            musicHasStarted = true;
             if (discIcon) discIcon.classList.add('fa-spin');
             if (statusText) statusText.textContent = 'Đang phát nhạc';
             // Add playing class -> trigger musicPulse animation & show equalizer bars
