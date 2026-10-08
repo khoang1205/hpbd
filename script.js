@@ -280,17 +280,11 @@ function initCandleBlowing() {
     const btnManualBlow = document.getElementById('btn-manual-blow');
 
     if (btnStartMic) {
-        btnStartMic.addEventListener('click', () => {
-            unlockMusicForMobile();
-            startMicDetection();
-        });
+        btnStartMic.addEventListener('click', startMicDetection);
     }
 
     if (btnManualBlow) {
-        btnManualBlow.addEventListener('click', () => {
-            unlockMusicForMobile();
-            triggerBlowSuccess();
-        });
+        btnManualBlow.addEventListener('click', triggerBlowSuccess);
     }
 }
 
@@ -821,20 +815,6 @@ function initMusicPlayer() {
         // Remove playing class -> stop musicPulse & hide equalizer
         if (btnToggle) btnToggle.classList.remove('playing');
     }
-}
-
-function unlockMusicForMobile() {
-    const audio = document.getElementById('bg-music');
-    if (!audio || !audio.paused) return;
-    const previousVolume = audio.volume;
-    audio.volume = 0;
-    audio.play().then(() => {
-        if (!musicHasStarted) {
-            audio.pause();
-            audio.currentTime = 0;
-        }
-        audio.volume = previousVolume;
-    }).catch(() => { audio.volume = previousVolume; });
 }
 
 let musicHasStarted = false;
