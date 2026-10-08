@@ -86,7 +86,6 @@ function initAppConfig() {
     const quizQuestion = document.getElementById('quiz-question');
     const hintBox = document.getElementById('hint-text');
     const letterText = document.getElementById('secret-letter-text');
-    const audioEl = document.getElementById('bg-music');
 
     if (cakeName) cakeName.textContent = CONFIG.recipientName;
     if (chibiRecipientName) chibiRecipientName.textContent = CONFIG.recipientName;
@@ -102,13 +101,7 @@ function initAppConfig() {
     if (letterText) {
         letterText.textContent = CONFIG.secretLetter;
     }
-    if (audioEl && CONFIG.musicUrl) {
-        const seekToMusicStart = () => {
-            audioEl.currentTime = CONFIG.musicStartTime || 0;
-        };
-        audioEl.addEventListener('loadedmetadata', seekToMusicStart, { once: true });
-        audioEl.src = `${CONFIG.musicUrl}#t=${CONFIG.musicStartTime || 0}`;
-    }
+
 }
 
 // ==================== 2. AMBIENT BACKGROUND ELEMENTS ====================
@@ -274,8 +267,6 @@ let micStream;
 let isCandleBlown = false;
 
 function initCandleBlowing() {
-    const btnMusicRetry = document.getElementById('btn-music-retry');
-    if (btnMusicRetry) btnMusicRetry.addEventListener('click', playMusic);
     const btnStartMic = document.getElementById('btn-start-mic');
     const btnManualBlow = document.getElementById('btn-manual-blow');
 
@@ -583,8 +574,7 @@ function triggerBlowSuccess() {
                     if (btnChibiProceed) {
                         btnChibiProceed.onclick = (e) => {
                             e.stopPropagation();
-                            const audio = document.getElementById('bg-music');
-                            if (audio && audio.paused) playMusic();
+
                             proceedToPlayground();
                         };
                     }
@@ -792,59 +782,97 @@ function drawScratchCover(ctx, width, height) {
 }
 
 // ==================== 7. MUSIC PLAYER CONTROLLER ====================
-function initMusicPlayer() {
-    const audioEl = document.getElementById('bg-music');
-    const btnToggle = document.getElementById('btn-music-toggle');
-    const discIcon = document.getElementById('music-disc-icon');
-    const statusText = document.getElementById('music-status-text');
+let birthdayMusicContext;
+let birthdayMusicBufferPromise;
+let birthdayMusicSource;
+let birthdayMusicOffset = 0;
+let birthdayMusicStartedAt = 0;
+let birthdayMusicPlaying = false;
+let birthdayMusicStarting = false;
 
-    if (!btnToggle || !audioEl) return;
-
-    btnToggle.addEventListener('click', () => {
-        if (audioEl.paused) {
-            playMusic();
-        } else {
-            pauseMusic();
-        }
-    });
-
-    function pauseMusic() {
-        audioEl.pause();
-        if (discIcon) discIcon.classList.remove('fa-spin');
-        if (statusText) statusText.textContent = 'Phát nhạc';
-        // Remove playing class -> stop musicPulse & hide equalizer
-        if (btnToggle) btnToggle.classList.remove('playing');
+function prepareBirthdayMusic() {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    if (!birthdayMusicContext) birthdayMusicContext = new AudioCtx();
+    if (!birthdayMusicBufferPromise) {
+        birthdayMusicBufferPromise = fetch(CONFIG.musicUrl)
+            .then(response => {
+                if (!response.ok) throw new Error('Music download failed');
+                return response.arrayBuffer();
+            })
+            .then(bytes => birthdayMusicContext.decodeAudioData(bytes))
+            .catch(error => {
+                birthdayMusicBufferPromise = null;
+                console.warn('Music loading failed:', error);
+                return null;
+            });
     }
+    return birthdayMusicBufferPromise;
 }
 
-let musicHasStarted = false;
+function unlockBirthdayMusic() {
+    prepareBirthdayMusic();
+    if (!birthdayMusicContext) return;
+    // Resume in the user's gesture; no song source starts here.
+    birthdayMusicContext.resume().catch(() => {});
+    const silence = birthdayMusicContext.createBufferSource();
+    silence.buffer = birthdayMusicContext.createBuffer(1, 1, birthdayMusicContext.sampleRate);
+    silence.connect(birthdayMusicContext.destination);
+    silence.start();
+}
 
-function playMusic() {
-    const audioEl = document.getElementById('bg-music');
-    const discIcon = document.getElementById('music-disc-icon');
-    const statusText = document.getElementById('music-status-text');
-    const btnToggle = document.getElementById('btn-music-toggle');
+function updateMusicControls(playing) {
+    const disc = document.getElementById('music-disc-icon');
+    const status = document.getElementById('music-status-text');
+    const button = document.getElementById('btn-music-toggle');
+    if (disc) disc.classList.toggle('fa-spin', playing);
+    if (button) button.classList.toggle('playing', playing);
+    if (status) status.textContent = playing ? 'Đang phát nhạc' : 'Phát nhạc';
+}
 
-    if (audioEl) {
-        // The MP3 is already trimmed; play immediately within the tap gesture.
-        if (!musicHasStarted && audioEl.readyState >= 1) {
-            audioEl.currentTime = CONFIG.musicStartTime || 0;
-        }
-        audioEl.play().then(() => {
-            musicHasStarted = true;
-            const retry = document.getElementById('btn-music-retry');
-            if (retry) retry.hidden = true;
-            if (discIcon) discIcon.classList.add('fa-spin');
-            if (statusText) statusText.textContent = 'Đang phát nhạc';
-            // Add playing class -> trigger musicPulse animation & show equalizer bars
-            if (btnToggle) btnToggle.classList.add('playing');
-        }).catch(err => {
-            const retry = document.getElementById('btn-music-retry');
-            if (retry) retry.hidden = false;
-            if (discIcon) discIcon.classList.remove('fa-spin');
-            if (statusText) statusText.textContent = 'Phát nhạc';
-            console.warn("Autoplay prevented:", err);
-        });
+function initMusicPlayer() {
+    prepareBirthdayMusic();
+    document.addEventListener('pointerdown', unlockBirthdayMusic, { capture: true });
+    document.addEventListener('keydown', unlockBirthdayMusic, { capture: true });
+    const button = document.getElementById('btn-music-toggle');
+    if (button) button.addEventListener('click', () => {
+        if (birthdayMusicPlaying) pauseMusic();
+        else playMusic();
+    });
+    updateMusicControls(false);
+}
+
+function pauseMusic() {
+    if (!birthdayMusicSource || !birthdayMusicPlaying) return;
+    birthdayMusicOffset += birthdayMusicContext.currentTime - birthdayMusicStartedAt;
+    birthdayMusicSource.stop();
+    birthdayMusicSource.disconnect();
+    birthdayMusicSource = null;
+    birthdayMusicPlaying = false;
+    updateMusicControls(false);
+}
+
+async function playMusic() {
+    if (birthdayMusicPlaying || birthdayMusicStarting) return;
+    birthdayMusicStarting = true;
+    try {
+        const buffer = await prepareBirthdayMusic();
+        if (!buffer || !birthdayMusicContext) return;
+        await birthdayMusicContext.resume();
+        const source = birthdayMusicContext.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+        source.connect(birthdayMusicContext.destination);
+        source.start(0, birthdayMusicOffset % buffer.duration);
+        birthdayMusicSource = source;
+        birthdayMusicStartedAt = birthdayMusicContext.currentTime;
+        birthdayMusicPlaying = true;
+        updateMusicControls(true);
+    } catch (error) {
+        console.warn('Music playback failed:', error);
+        updateMusicControls(false);
+    } finally {
+        birthdayMusicStarting = false;
     }
 }
 
