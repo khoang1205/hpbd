@@ -58,6 +58,10 @@ function initAppConfig() {
         letterText.textContent = CONFIG.secretLetter;
     }
     if (audioEl && CONFIG.musicUrl) {
+        const seekToMusicStart = () => {
+            audioEl.currentTime = CONFIG.musicStartTime || 0;
+        };
+        audioEl.addEventListener('loadedmetadata', seekToMusicStart, { once: true });
         audioEl.src = CONFIG.musicUrl;
     }
 }

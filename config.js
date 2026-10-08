@@ -29,7 +29,9 @@ Một lần nữa, chúc ng đẹp luôn luôn vui cười, thích cái gì sẽ
     photos: [],
 
     // Nhạc nền (Audio chúc mừng sinh nhật)
-    musicUrl: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=happy-birthday-155461.mp3",
+    musicUrl: "YTSave_YouTube_Media_7A__FGKx1FE_CESFERKHOI-HÔM-NAY-SINH-NHẬT-AI-THẾ-OFFICIAL-MUSIC-VIDEO_009_128k.mp3",
+
+    musicStartTime: 26.3, // Bắt đầu bài hát từ 0:26.3
     
     // Cấu hình mic thổi nến
     micThreshold: 65 // Âm lượng ngưỡng phát hiện tiếng thổi vào mic (0-100)
